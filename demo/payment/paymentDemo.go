@@ -31,7 +31,7 @@ type PaymentDemo struct {
 func (c *PaymentDemo) Setup(app string) {
 	c.demoAppID = app
 	c.demoChannel = "alipay"
-	c.demoPayment = "ch_L8qn10mLmr1GS8e5OODmHaL4"
+	c.demoPayment = "f6676f79487842f394db045e93395359"
 }
 
 func (c *PaymentDemo) New() (*xpay.Payment, error) {

@@ -3,6 +3,7 @@ package xpay
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 
 	"crypto"
 	"crypto/rand"
@@ -51,8 +52,19 @@ func GenSign(data []byte, privateKey []byte) (sign []byte, err error) {
 
 	priv, err := x509.ParsePKCS1PrivateKey(block.Bytes)
 	if err != nil {
-		return nil, err
+		fmt.Printf("pkcs8\n")
+		rawKey, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+		if err != nil {
+			return nil, err
+		}
+
+		var ok bool
+		priv, ok = rawKey.(*rsa.PrivateKey)
+		if ok == false {
+			return nil, errors.New("pkcs8 raw key to private key error")
+		}
 	}
+
 	hashFunc := crypto.SHA256
 	h := hashFunc.New()
 	h.Write(data)
@@ -66,6 +78,7 @@ func Verify(data []byte, publicKey []byte, sign []byte) (err error) {
 	if block == nil {
 		return errors.New("public key error")
 	}
+
 	pubInterface, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return err

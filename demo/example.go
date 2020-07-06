@@ -35,7 +35,7 @@ func (c *Demo) Setup() {
 	c.App = "f5fe7e65ad7f46af89921565f78a9879"
 	xpay.Key = "3d6285c77d1646f096c21210f9a6db22"
 	xpay.LogLevel = 2
-	xpay.AccountPrivateKey = readFile("your_rsa_private_key.pem")
+	xpay.AccountPrivateKey = readFile("your_rsa_private_key_pkcs8.pem")
 
 	for i := len(c.examples) - 1; i >= 0; i-- {
 		c.examples[i].Setup(c.App)
