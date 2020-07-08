@@ -346,7 +346,7 @@ signature := r.Header.Get("x-xxxpay-signature")
 ```
 2. 把 Webhooks 通知、XPay 管理平台提供的 RSA 公钥、 和 base64 解码后的签名三者一同放入 RSA 的签名函数中进行非对称的签名运算,来判断签名是否验证通过。
 
-由于某些原因，验证签名的方法并没有集成在 SDK 里，但是我们提供了 Demo ，具体参考[Go SDK Demo](https://github.com/PingPlusPlus/xpay-go/blob/master/verifyDemo.go)。
+由于某些原因，验证签名的方法并没有集成在 SDK 里，但是我们提供了 Demo ，具体参考[Go SDK Demo](https://github.com/xxxpay/xpay-go/blob/master/verifyDemo.go)。
 
 
 **当商户 Server 能够正确获得支付凭据并且正确返回给 Client ，而且也完成了对 Webhooks 的监听、接收和验证。至此， Server  SDK 的接入已经完成。现在需要去完成 Client SDK 的接入**

@@ -7,7 +7,7 @@
 package batch_withdraw
 
 import (
-	"github.com/PingPlusPlus/xpay-go/xpay/batchWithdrawal"
+	"github.com/xxxpay/xpay-go/xpay/batchWithdrawal"
 	"github.com/xxxpay/xpay-go/demo/common"
 	xpay "github.com/xxxpay/xpay-go/xpay"
 )

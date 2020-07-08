@@ -1430,7 +1430,7 @@ type (
 		SplitReceiver string `json:"split_receiver"` // 分账接收方ID
 		Amount        int    `json:"amount"`         // 分账金额
 		Currency      string `json:"currency"`       // 货币币种
-		Name          string `json:"name"`           // 分账接收方姓名，如果商家传递该字段则 Pingxx 需校验 name 与 split_receiver 是否对应
+		Name          string `json:"name"`           // 分账接收方姓名，如果商家传递该字段则 XPay 需校验 name 与 split_receiver 是否对应
 		Description   string `json:"description"`    // 分账描述
 		Status        string `json:"status"`         // 分账单状态，`pending`:待分账、`succeeded`:分账成功 、`adjust`:分账失败待调账 、`returned`:已转回分账方、`closed`:已关闭、`failed`:分账失败
 		TimeFinished  int    `json:"time_finished"`  // 分账完成时间
@@ -1440,7 +1440,7 @@ type (
 	SplitProfitRecipientParams struct {
 		SplitReceiver string `json:"split_receiver"` // 19,-,无,分账接收方ID,type 为`split_normal` 时必须填写;`type` 为`split_return` 时不支持该参数
 		Amount        int    `json:"amount"`         // -,required,无,分账金额
-		Name          string `json:"name,omitempty"` // [1~1024],optional,无,分账接收方姓名，如果商家传递该字段则 Pingxx 需校验 name 与 split_receiver 是否对应,type 为`split_normal` 时必须填写;`type` 为`split_return` 时不支持该参数
+		Name          string `json:"name,omitempty"` // [1~1024],optional,无,分账接收方姓名，如果商家传递该字段则 XPay 需校验 name 与 split_receiver 是否对应,type 为`split_normal` 时必须填写;`type` 为`split_return` 时不支持该参数
 		Description   string `json:"description"`    // [1~80],required,无,分账描述（不支持特殊字符 `&` ）
 	}
 

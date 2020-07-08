@@ -52,7 +52,7 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 		//示例 - 待验签的数据
 		//data := `{"id":"evt_eYa58Wd44Glerl8AgfYfd1sL","created":1434368075,"livemode":true,"type":"payment.succeeded","data":{"object":{"id":"ch_bq9IHKnn6GnLzsS0swOujr4x","object":"payment","created":1434368069,"livemode":true,"paid":true,"refunded":false,"app":"app_vcPcqDeS88ixrPlu","channel":"wx","order_no":"2015d019f7cf6c0d","client_ip":"140.227.22.72","amount":100,"amount_settle":0,"currency":"cny","subject":"An Apple","body":"A Big Red Apple","extra":{},"time_paid":1434368074,"time_expire":1434455469,"time_settle":null,"transaction_no":"1014400031201506150354653857","refunds":{"object":"list","url":"/v1/payments/ch_bq9IHKnn6GnLzsS0swOujr4x/refunds","has_more":false,"data":[]},"amount_refunded":0,"failure_code":null,"failure_msg":null,"metadata":{},"credential":{},"description":null}},"object":"event","pending_webhooks":0,"request":"iar_Xc2SGjrbdmT0eeKWeCsvLhbL"}`
 		data := buf.String()
-		// 请从 https://dashboard.pay.lucfish.com 获取「Ping++ 公钥」
+		// 请从 https://dashboard.pay.lucfish.com 获取「Xpay 公钥」
 		publicKey, err := ioutil.ReadFile("xpay_rsa_public_key.pem")
 		if err != nil {
 			fmt.Errorf("read failure: %v", err)

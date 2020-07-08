@@ -7,7 +7,7 @@
 package withdrawal
 
 import (
-	"github.com/PingPlusPlus/xpay-go/xpay/withdrawal"
+	"github.com/xxxpay/xpay-go/xpay/withdrawal"
 	"github.com/xxxpay/xpay-go/demo/common"
 	xpay "github.com/xxxpay/xpay-go/xpay"
 )

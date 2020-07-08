@@ -7,7 +7,7 @@
 package settle_account
 
 import (
-	"github.com/PingPlusPlus/xpay-go/xpay/settleAccount"
+	"github.com/xxxpay/xpay-go/xpay/settleAccount"
 	xpay "github.com/xxxpay/xpay-go/xpay"
 )
 
