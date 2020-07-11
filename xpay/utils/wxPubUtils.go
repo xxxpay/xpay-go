@@ -33,7 +33,7 @@ type JsapiTicket struct {
 type Wx_pub struct {
 	AppId     string `json:"appId"`
 	NonceStr  string `json:"nonceStr"`
-	TimeStamp string `json:"timeStamp"`
+	TimeStamp string `json:"timestamp"`
 	Package   string `json:"package"`
 	SignType  string `json:"signType"`
 	PaySign   string `json:"paySign"`
