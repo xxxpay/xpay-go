@@ -12,7 +12,7 @@ import (
 
 const (
 	// 当前版本的api地址
-	apiBase = "https://api-test2.lucfish.com/xpay/v2"
+	apiBase = "https://api-test.lucfish.com/xpay/v2"
 	// 当前版本的api生成生成时间
 	apiVersion = "2017-06-30"
 	// httpclient等待时间
