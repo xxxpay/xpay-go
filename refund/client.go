@@ -32,7 +32,7 @@ func (c Client) New(ch string, params *xpay.RefundParams) (*xpay.Refund, error) 
 		log.Printf("params of refund request to xpay is :\n %v\n ", string(paramsString))
 	}
 	refund := &xpay.Refund{}
-	err := c.B.Call("POST", fmt.Sprintf("/charges/%v/refunds", ch), c.Key, nil, paramsString, refund)
+	err := c.B.Call("POST", fmt.Sprintf("/payments/%v/refunds", ch), c.Key, nil, paramsString, refund)
 	return refund, err
 }
 
@@ -44,7 +44,7 @@ func (c Client) Get(chid string, reid string) (*xpay.Refund, error) {
 	var body *url.Values
 	body = &url.Values{}
 	refund := &xpay.Refund{}
-	err := c.B.Call("GET", fmt.Sprintf("/charges/%v/refunds/%v", chid, reid), c.Key, body, nil, refund)
+	err := c.B.Call("GET", fmt.Sprintf("/payments/%v/refunds/%v", chid, reid), c.Key, body, nil, refund)
 	return refund, err
 }
 
@@ -61,7 +61,7 @@ func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
 
 	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
 		list := &xpay.RefundList{}
-		err := c.B.Call("GET", fmt.Sprintf("/charges/%v/refunds", chid), c.Key, &b, nil, list)
+		err := c.B.Call("GET", fmt.Sprintf("/payments/%v/refunds", chid), c.Key, &b, nil, list)
 
 		ret := make([]interface{}, len(list.Values))
 		for i, v := range list.Values {

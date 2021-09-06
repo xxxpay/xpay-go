@@ -100,27 +100,27 @@ func (c Client) List(params *xpay.PagingParams) (*xpay.OrderList, error) {
 	return orderList, err
 }
 
-func Charge(orderID, chargeID string) (*xpay.Charge, error) {
-	return getC().Charge(orderID, chargeID)
+func Payment(orderID, chargeID string) (*xpay.Payment, error) {
+	return getC().Payment(orderID, chargeID)
 }
 
-func (c Client) Charge(orderID, chargeID string) (*xpay.Charge, error) {
-	charge := &xpay.Charge{}
+func (c Client) Payment(orderID, chargeID string) (*xpay.Payment, error) {
+	payment := &xpay.Payment{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/charges/%s", orderID, chargeID), c.Key, nil, nil, charge)
-	return charge, err
+	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/payments/%s", orderID, chargeID), c.Key, nil, nil, payment)
+	return payment, err
 }
 
-func ChargeList(orderID string, params *xpay.PagingParams) (*xpay.ChargeList, error) {
-	return getC().ChargeList(orderID, params)
+func PaymentList(orderID string, params *xpay.PagingParams) (*xpay.PaymentList, error) {
+	return getC().PaymentList(orderID, params)
 }
 
-func (c Client) ChargeList(orderID string, params *xpay.PagingParams) (*xpay.ChargeList, error) {
+func (c Client) PaymentList(orderID string, params *xpay.PagingParams) (*xpay.PaymentList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
-	chargeList := &xpay.ChargeList{}
-	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/charges", orderID), c.Key, body, nil, chargeList)
+	chargeList := &xpay.PaymentList{}
+	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/payments", orderID), c.Key, body, nil, chargeList)
 	return chargeList, err
 }
 

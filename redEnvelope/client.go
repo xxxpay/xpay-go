@@ -20,7 +20,7 @@ func (c Client) New(params *xpay.RedEnvelopeParams) (*xpay.RedEnvelope, error) {
 	paramsString, errs := xpay.JsonEncode(params)
 	if errs != nil {
 		if xpay.LogLevel > 0 {
-			log.Printf("ChargeParams Marshall Errors is : %q/n", errs)
+			log.Printf("PaymentParams Marshall Errors is : %q/n", errs)
 		}
 		return nil, errs
 	}

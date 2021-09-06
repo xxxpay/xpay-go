@@ -173,14 +173,14 @@ func GetJsapiTicket(app_id string, app_secret string) (ticket string) {
 
 /**
  * 生成微信公众号 js sdk signature
- * @param charge Charge
+ * @param payment Payment
  * @param jsapi_ticket string
  * @param urls string  当前页面的 url， 必须要动态获取
  * @return signatrue []byte
  */
-func GetSignature(charge *xpay.Charge, jsapi_ticket string, urls string) (signatrue []byte) {
+func GetSignature(payment *xpay.Payment, jsapi_ticket string, urls string) (signatrue []byte) {
 	var wx Wx_pub
-	a := charge.Credential
+	a := payment.Credential
 	m := a["wx_pub"]
 	s, _ := xpay.JsonEncode(m)
 	xpay.JsonDecode(s, &wx)

@@ -1,6 +1,6 @@
 // Package xpay xpay golang sdk 数据类型定义
 // types涵盖了以下数据格式
-//    1.支付订单对象Charge;
+//    1.支付订单对象Payment;
 //    2.订单退款对象Refund;
 //    3.红包对象RedEnvelope;
 //    4.企业转账对象Transfer;
@@ -32,8 +32,8 @@ type DeleteResult struct {
 
 /*支付相关数据类型*/
 type (
-	// ChargeParams 支付请求数据类型
-	ChargeParams struct {
+	// PaymentParams 支付请求数据类型
+	PaymentParams struct {
 		Order_no    string                 `json:"order_no"`
 		App         App                    `json:"app"`
 		Channel     string                 `json:"channel"`
@@ -47,14 +47,14 @@ type (
 		Time_expire int64                  `json:"time_expire,omitempty"`
 		Description string                 `json:"description,omitempty"`
 	}
-	// ChargeListParams 列表查询请求 数据类型
-	ChargeListParams struct {
+	// PaymentListParams 列表查询请求 数据类型
+	PaymentListParams struct {
 		ListParams
 		Created int64
 	}
 
-	// Charge 数据类型
-	Charge struct {
+	// Payment 数据类型
+	Payment struct {
 		ID              string                 `json:"id"`
 		Object          string                 `json:"object"`
 		Created         int64                  `json:"created"`
@@ -85,10 +85,10 @@ type (
 		Description     string                 `json:"description"`
 	}
 
-	// ChargeList 列表数据类型
-	ChargeList struct {
+	// PaymentList 列表数据类型
+	PaymentList struct {
 		ListMeta
-		Values []*Charge `json:"data"`
+		Values []*Payment `json:"data"`
 	}
 )
 
@@ -105,7 +105,7 @@ type (
 	// RefundListParams 退款查询请求的数据类型
 	RefundListParams struct {
 		ListParams
-		Charge string
+		Payment string
 	}
 
 	// Refund 付款退款数据类型
@@ -122,8 +122,8 @@ type (
 		Failure_code    string                 `json:"failure_code"`
 		Failure_msg     string                 `json:"failure_msg"`
 		Metadata        map[string]interface{} `json:"metadata"`
-		Charge_id       string                 `json:"charge"`
-		Charge_order_no string                 `json:"charge_order_no"`
+		Payment_id       string                 `json:"payment"`
+		Payment_order_no string                 `json:"charge_order_no"`
 		Transaction_no  string                 `json:"transaction_no"`
 		Funding_source  string                 `json:"funding_source,omitempty"`
 		Extra           map[string]interface{} `json:"extra"`
@@ -457,8 +457,8 @@ type (
 		App_display_name  string `json:"app_display_name"`
 		Summary_from      uint64 `json:"summary_from"`
 		Summary_to        uint64 `json:"summary_to"`
-		Charges_amount    uint64 `json:"charges_amount"`
-		Charges_count     uint64 `json:"charges_count"`
+		Payments_amount    uint64 `json:"payments_amount"`
+		Payments_count     uint64 `json:"payments_count"`
 	}
 )
 
@@ -547,13 +547,13 @@ type (
 		Created     int64                  `json:"created"`
 		Description string                 `json:"description"`
 		Metadata    map[string]interface{} `json:"metadata"`
-		Charges     []struct {
-			Charge         string  `json:"charge"`
+		Payments     []struct {
+			Payment         string  `json:"payment"`
 			Amount         *int64  `json:"amount,omitempty"`
 			Description    *string `json:"description,omitempty"`
 			Status         string  `json:"status"`
 			Funding_source *string `json:"funding_source,omitempty"`
-		} `json:"charges"`
+		} `json:"payments"`
 		Refunds        RefundList `json:"refunds"`
 		Refund_url     string     `json:"refund_url"`
 		Status         string     `json:"status"`
@@ -564,7 +564,7 @@ type (
 	BatchRefundParams struct {
 		App         string                   `json:"app"`
 		Batch_no    string                   `json:"batch_no"`
-		Charges     []map[string]interface{} `json:"charges"`
+		Payments     []map[string]interface{} `json:"payments"`
 		Description string                   `json:"description,omitempty"`
 		Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 	}
@@ -583,7 +583,7 @@ type (
 		Trade_no         string                 `json:"trade_no"`
 		Customs_code     string                 `json:"customs_code"`
 		Amount           int64                  `json:"amount"`
-		Charge           string                 `json:"charge"`
+		Payment           string                 `json:"payment"`
 		Transport_amount int64                  `json:"transport_amount"`
 		Is_split         bool                   `json:"is_split"`
 		Sub_order_no     string                 `json:"sub_order_no"`
@@ -603,7 +603,7 @@ type (
 		Trade_no         string                 `json:"trade_no"`
 		Customs_code     string                 `json:"customs_code"`
 		Amount           int64                  `json:"amount"`
-		Charge           string                 `json:"charge"`
+		Payment           string                 `json:"payment"`
 		Transport_amount int64                  `json:"transport_amount"`
 		Is_split         bool                   `json:"is_split"`
 		Sub_order_no     string                 `json:"sub_order_no"`
@@ -863,11 +863,11 @@ type (
 	}
 	// OrderPayParams 订单支付请求参数
 	OrderPayParams struct {
-		Charge_amount   *int64                 `json:"charge_amount,omitempty"`
+		Payment_amount   *int64                 `json:"charge_amount,omitempty"`
 		Channel         string                 `json:"channel,omitempty"`
 		Extra           map[string]interface{} `json:"extra,omitempty"`
 		TimeExpire      int64                  `json:"time_expire,omitempty"` // 时间戳
-		Charge_order_no string                 `json:"charge_order_no,omitempty"`
+		Payment_order_no string                 `json:"charge_order_no,omitempty"`
 	}
 
 	// Order 数据类型
@@ -894,9 +894,9 @@ type (
 		Time_paid         int64                  `json:"time_paid"`
 		Time_expire       int64                  `json:"time_expire"`
 		Coupon            string                 `json:"coupon"`
-		Charge            string                 `json:"charge"`
-		Charges           ChargeList             `json:"charges"`
-		Charge_essentials map[string]interface{} `json:"charge_essentials"`
+		Payment            string                 `json:"payment"`
+		Payments           PaymentList             `json:"payments"`
+		Payment_essentials map[string]interface{} `json:"charge_essentials"`
 		Available_balance int64                  `json:"available_balance"`
 		ReceiptApp        string                 `json:"receipt_app"`
 		ServiceApp        string                 `json:"service_app"`
@@ -925,7 +925,7 @@ type (
 		User               string                 `json:"user"`
 		From               string                 `json:"from"`
 		UserFee            int                    `json:"user_fee"`
-		Charge             Charge                 `json:"charge"`
+		Payment             Payment                 `json:"payment"`
 		BalanceBonus       BalanceBonus           `json:"balance_bonus"`
 		BalanceTransaction string                 `json:"balance_transaction"`
 		Description        string                 `json:"description"`
@@ -949,8 +949,8 @@ type (
 type (
 	// OrderRefundParams 订单退款请求参数
 	OrderRefundParams struct {
-		Charge         string                 `json:"charge,omitempty"`
-		Charge_amount  *int64                 `json:"charge_amount,omitempty"`
+		Payment         string                 `json:"payment,omitempty"`
+		Payment_amount  *int64                 `json:"charge_amount,omitempty"`
 		Description    string                 `json:"description,omitempty"`
 		Metadata       map[string]interface{} `json:"metadata,omitempty"`
 		Refund_mode    string                 `json:"refund_mode,omitempty"`
@@ -974,9 +974,9 @@ type (
 		Amount              int64                  `json:"amount"`
 		Coupon_amount       int64                  `json:"coupon_amount"`
 		Balance_amount      int64                  `json:"balance_amount"`
-		Charge_amount       int64                  `json:"charge_amount"`
+		Payment_amount       int64                  `json:"charge_amount"`
 		Balance_transaction string                 `json:"balance_transaction"`
-		Charge_refund       string                 `json:"charge_refund"`
+		Payment_refund       string                 `json:"charge_refund"`
 		Created             int64                  `json:"created"`
 		Status              string                 `json:"status"`
 		Time_succeed        int64                  `json:"time_succeed"`
@@ -1141,7 +1141,7 @@ type (
 type (
 	RechargeParams struct {
 		User         string                 `json:"user"`
-		Charge       RechargeCharge         `json:"charge"`
+		Payment       RechargePayment         `json:"payment"`
 		UserFee      int                    `json:"user_fee,omitempty"`
 		BalanceBonus RechargeBonus          `json:"balance_bonus,omitempty"`
 		FromUser     string                 `json:"from_user,omitempty"`
@@ -1149,7 +1149,7 @@ type (
 		Metadata     map[string]interface{} `json:"metadata,omitempty"`
 	}
 
-	RechargeCharge struct {
+	RechargePayment struct {
 		Amount     int    `json:"amount"`
 		Channel    string `json:"channel"`
 		OrderNo    string `json:"order_no"`
@@ -1406,7 +1406,7 @@ type (
 		Object        string                 `json:"object"`         // 值为 `split_profit`。
 		Livemode      bool                   `json:"livemode"`       // 是否是 live 模式。
 		App           string                 `json:"app"`            // App ID。
-		Charge        string                 `json:"charge"`         // xpay 交易成功的 charge ID
+		Payment        string                 `json:"payment"`         // xpay 交易成功的 payment ID
 		Channel       string                 `json:"channel"`        // 分账使用的第三方支付渠道(暂时只支持微信境内支付渠道)。
 		OrderNo       string                 `json:"order_no"`       // 分账商户订单号
 		Type          string                 `json:"type"`           // 分账类型: `split_normal` 为普通分账,`split_return` 为完结分账
@@ -1447,7 +1447,7 @@ type (
 	// SplitProfitParams 请求创建分账参数
 	SplitProfitParams struct {
 		App        string                       `json:"app"`                // 20,required,无,App ID。
-		Charge     string                       `json:"charge"`             // 27,required,无,xpay 交易成功的 charge ID
+		Payment     string                       `json:"payment"`             // 27,required,无,xpay 交易成功的 payment ID
 		OrderNo    string                       `json:"order_no"`           // [1~64],required,无,分账单号，由商家自行生成，规则参照微信分账参数规则
 		Type       string                       `json:"type"`               // -,required,无,分账类型: `split_normal` 为普通分账,`split_return` 为完结分账
 		Recipients []SplitProfitRecipientParams `json:"recipients"`         // -,required,无,分账接收列表，类型为数组。每一个元素的具体规则参考分账接收列表请求参数（recipients）说明。
