@@ -11,8 +11,6 @@ import (
 )
 
 const (
-	// 当前版本的api地址
-	apiBase = "https://api-test.lucfish.com/xpay/v2"
 	// 当前版本的api生成生成时间
 	apiVersion = "2017-06-30"
 	// httpclient等待时间
@@ -22,6 +20,8 @@ const (
 )
 
 var (
+	// 当前版本的api地址
+	APIBase = "https://api.xpay.ucfish.com/xpay/v2"
 	// 默认错误信息返回语言
 	AcceptLanguage = "zh-CN"
 	// xpay api统一需要通过Authentication（http BasicAuth），需要在调用时赋值
@@ -68,7 +68,7 @@ func GetBackend(backend SupportedBackend) Backend {
 	switch backend {
 	case APIBackend:
 		if backends.API == nil {
-			backends.API = ApiBackend{backend, apiBase, httpClient}
+			backends.API = ApiBackend{backend, APIBase, httpClient}
 		}
 
 		ret = backends.API
