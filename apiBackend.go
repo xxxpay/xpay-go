@@ -26,11 +26,33 @@ func (s ApiBackend) Call(method, path, key string, form *url.Values, params []by
 	var body io.Reader
 	if strings.ToUpper(method) == "POST" || strings.ToUpper(method) == "PUT" {
 		body = bytes.NewBuffer(params)
+
+		if CustomQuery != nil && len(CustomQuery) > 0 {
+			path += "?" + CustomQuery.Encode()
+		}
 	}
 
 	if strings.ToUpper(method) == "GET" || strings.ToUpper(method) == "DELETE" {
+		qs := make(url.Values)
+
+		if CustomQuery != nil && len(CustomQuery) > 0 {
+			for k, values := range CustomQuery {
+				for _, val := range values {
+					qs.Add(k, val)
+				}
+			}
+		}
+
 		if form != nil && len(*form) > 0 {
-			data := form.Encode()
+			for k, values := range *form {
+				for _, val := range values {
+					qs.Add(k, val)
+				}
+			}
+		}
+
+		if len(qs) > 0 {
+			data := qs.Encode()
 			path += "?" + data
 		}
 	}

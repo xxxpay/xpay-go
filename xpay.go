@@ -22,6 +22,8 @@ const (
 var (
 	// 当前版本的api地址
 	APIBase = "https://api.xpay.ucfish.com/xpay/v2"
+	// 用户自定义附加Query参数
+	CustomQuery = make(url.Values)
 	// 默认错误信息返回语言
 	AcceptLanguage = "zh-CN"
 	// xpay api统一需要通过Authentication（http BasicAuth），需要在调用时赋值
