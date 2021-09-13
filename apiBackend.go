@@ -75,8 +75,7 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
-	path = s.URL + path
-	req, err := http.NewRequest(method, path, body)
+	req, err := http.NewRequest(method, s.URL+path, body)
 	if LogLevel > 2 {
 		log.Printf("Request to xpay is : \n %v\n", req)
 	}
@@ -93,7 +92,9 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 	}
 	requestTime := fmt.Sprintf("%d", time.Now().Unix())
 	req.Header.Set("X-Request-Timestamp", requestTime)
-	dataToBeSign = dataToBeSign + req.URL.RequestURI() + requestTime
+
+	req.URL.Hostname()
+	dataToBeSign = dataToBeSign + path + requestTime
 
 	if len(AccountPrivateKey) > 0 {
 		sign, err := GenSign([]byte(dataToBeSign), []byte(AccountPrivateKey))
