@@ -87,13 +87,18 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 		}
 		return nil, err
 	}
-	var dataToBeSign string
+	var data string
 	if strings.ToUpper(method) == "POST" || strings.ToUpper(method) == "PUT" {
-		dataToBeSign = string(params)
+		data = string(params)
 	}
 	requestTime := fmt.Sprintf("%d", time.Now().Unix())
 	req.Header.Set("X-Request-Timestamp", requestTime)
-	dataToBeSign = dataToBeSign + req.URL.RequestURI() + requestTime
+	uri := req.URL.RequestURI()
+	dataToBeSign := data + uri + requestTime
+
+	log.Printf("RSA signature data: %s", data)
+	log.Printf("RSA signature uri: %s", uri)
+	log.Printf("RSA signature time: %s", requestTime)
 
 	if len(AccountPrivateKey) > 0 {
 		sign, err := GenSign([]byte(dataToBeSign), []byte(AccountPrivateKey))
