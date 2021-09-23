@@ -22,7 +22,7 @@ type ApiBackend struct {
 }
 
 // Call 后端处理请求方法
-func (s ApiBackend) Call(method, path, key string, form *url.Values, params []byte, v interface{}) error {
+func (s *ApiBackend) Call(method, path, key string, form *url.Values, params []byte, v interface{}) error {
 	var body io.Reader
 	if strings.ToUpper(method) == "POST" || strings.ToUpper(method) == "PUT" {
 		body = bytes.NewBuffer(params)
@@ -63,7 +63,7 @@ func (s ApiBackend) Call(method, path, key string, form *url.Values, params []by
 		return err
 	}
 
-	if err := s.Do(req, v); err != nil {
+	if err = s.Do(req, v); err != nil {
 		return err
 	}
 
@@ -166,7 +166,9 @@ func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
 
 		if res.StatusCode >= 400 {
 			var errMap map[string]interface{}
-			JsonDecode(resBody, &errMap)
+			if err := JsonDecode(resBody, &errMap); err != nil {
+				return err
+			}
 
 			if e, ok := errMap["error"]; !ok {
 				err := errors.New(string(resBody))
