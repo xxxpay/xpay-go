@@ -9,16 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-func New(appId string, params *xpay.BalanceBonusParams) (*xpay.BalanceBonus, error) {
-	return getC().New(appId, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(appId string, params *xpay.BalanceBonusParams) (*xpay.BalanceBonus, error) {
@@ -28,7 +23,7 @@ func (c Client) New(appId string, params *xpay.BalanceBonusParams) (*xpay.Balanc
 	}
 	balanceBonus := &xpay.BalanceBonus{}
 
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/balance_bonuses", appId), c.Key, nil, paramsString, balanceBonus)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/balance_bonuses", appId), nil, paramsString, balanceBonus)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Balance Bonus error: %v\n", err)
@@ -37,19 +32,11 @@ func (c Client) New(appId string, params *xpay.BalanceBonusParams) (*xpay.Balanc
 	return balanceBonus, err
 }
 
-func Get(appId, balanceBonusId string) (*xpay.BalanceBonus, error) {
-	return getC().Get(appId, balanceBonusId)
-}
-
 func (c Client) Get(appId, balanceBonusID string) (*xpay.BalanceBonus, error) {
 	balanceBonus := &xpay.BalanceBonus{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/balance_bonuses/%s", appId, balanceBonusID), c.Key, nil, nil, balanceBonus)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/balance_bonuses/%s", appId, balanceBonusID), nil, nil, balanceBonus)
 	return balanceBonus, err
-}
-
-func List(appID string, params *xpay.PagingParams) (*xpay.BalanceBonusList, error) {
-	return getC().List(appID, params)
 }
 
 func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.BalanceBonusList, error) {
@@ -57,6 +44,6 @@ func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.BalanceBonu
 	params.Filters.AppendTo(body)
 	balanceBonusList := &xpay.BalanceBonusList{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/balance_bonuses", appID), c.Key, body, nil, balanceBonusList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/balance_bonuses", appID), body, nil, balanceBonusList)
 	return balanceBonusList, err
 }

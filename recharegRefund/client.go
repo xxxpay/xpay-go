@@ -9,12 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(appID, id string, params *xpay.RechargeRefundParams) (*xpay.Refund, error) {
-	return getC().New(appID, id, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(appID, id string, params *xpay.RechargeRefundParams) (*xpay.Refund, error) {
@@ -30,23 +29,15 @@ func (c Client) New(appID, id string, params *xpay.RechargeRefundParams) (*xpay.
 	}
 
 	rechargeRefund := &xpay.Refund{}
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/recharges/%s/refunds", appID, id), c.Key, nil, paramsString, rechargeRefund)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/recharges/%s/refunds", appID, id), nil, paramsString, rechargeRefund)
 	return rechargeRefund, err
-}
-
-func Get(appID, rechargeID, refundID string) (*xpay.Refund, error) {
-	return getC().Get(appID, rechargeID, refundID)
 }
 
 func (c Client) Get(appID, rechargeID, refundID string) (*xpay.Refund, error) {
 	refund := &xpay.Refund{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s/refunds/%s", appID, rechargeID, refundID), c.Key, nil, nil, refund)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s/refunds/%s", appID, rechargeID, refundID), nil, nil, refund)
 	return refund, err
-}
-
-func List(appID, rechargeID string, params *xpay.PagingParams) (*xpay.RefundList, error) {
-	return getC().List(appID, rechargeID, params)
 }
 
 func (c Client) List(appID, rechargeID string, params *xpay.PagingParams) (*xpay.RefundList, error) {
@@ -54,10 +45,6 @@ func (c Client) List(appID, rechargeID string, params *xpay.PagingParams) (*xpay
 	params.Filters.AppendTo(body)
 	rechargeRefundList := &xpay.RefundList{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s/refunds", appID, rechargeID), c.Key, body, nil, rechargeRefundList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s/refunds", appID, rechargeID), body, nil, rechargeRefundList)
 	return rechargeRefundList, err
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

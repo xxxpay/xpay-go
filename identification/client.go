@@ -12,12 +12,11 @@ const (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(params *xpay.IdentificationParams) (*xpay.IdentificationResult, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(params *xpay.IdentificationParams) (*xpay.IdentificationResult, error) {
@@ -33,10 +32,6 @@ func (c Client) New(params *xpay.IdentificationParams) (*xpay.IdentificationResu
 	}
 	identificationResult := &xpay.IdentificationResult{}
 
-	err := c.B.Call("POST", "/identification", c.Key, nil, paramsString, identificationResult)
+	err := c.backend.Call("POST", "/identification", nil, paramsString, identificationResult)
 	return identificationResult, err
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

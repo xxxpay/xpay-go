@@ -9,17 +9,11 @@ import (
 
 // Client cardInfo 请求客户端
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-// New 发送 /card_info 请求
-func New(params *xpay.CardInfoParams) (*xpay.CardInfo, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // New 发送 /card_info 请求
@@ -37,7 +31,7 @@ func (c Client) New(params *xpay.CardInfoParams) (*xpay.CardInfo, error) {
 	}
 
 	cardInfo := &xpay.CardInfo{}
-	errch := c.B.Call("POST", "/card_info", c.Key, nil, paramsString, cardInfo)
+	errch := c.backend.Call("POST", "/card_info", nil, paramsString, cardInfo)
 	if errch != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", errch)

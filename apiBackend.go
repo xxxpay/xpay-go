@@ -16,26 +16,78 @@ import (
 
 // ApiBackend api相关的后端类型
 type ApiBackend struct {
-	URL        string
-	HTTPClient *http.Client
+	baseUrl           string
+	customQuery       url.Values
+	acceptLanguage    string
+	key               string
+	logLevel          int
+	accountPrivateKey string
+	httpClient        *http.Client
+}
+
+type ApiBackendOption func(*ApiBackend)
+
+func NewApiBackend(options ...ApiBackendOption) *ApiBackend {
+	backend := &ApiBackend{
+		baseUrl:           APIBase,
+		acceptLanguage:    AcceptLanguage,
+		key:               Key,
+		logLevel:          LogLevel,
+		accountPrivateKey: AccountPrivateKey,
+		httpClient:        &http.Client{Timeout: defaultHTTPTimeout},
+	}
+	for _, o := range options {
+		o(backend)
+	}
+	return backend
+}
+
+func WithBaseUrl(baseUrl string) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.baseUrl = baseUrl
+	}
+}
+
+func WithCustomQuery(query url.Values) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.customQuery = query
+	}
+}
+
+func WithAcceptLanguage(lang string) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.acceptLanguage = lang
+	}
+}
+
+func WithLogLevel(level int) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.logLevel = level
+	}
+}
+
+func WithAccountPrivateKey(key string) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.accountPrivateKey = key
+	}
 }
 
 // Call 后端处理请求方法
-func (s *ApiBackend) Call(method, path, key string, form *url.Values, params []byte, v interface{}) error {
+func (s *ApiBackend) Call(method, path string, form *url.Values, params []byte, v interface{}) error {
 	var body io.Reader
 	if strings.ToUpper(method) == "POST" || strings.ToUpper(method) == "PUT" {
 		body = bytes.NewBuffer(params)
 
-		if CustomQuery != nil && len(CustomQuery) > 0 {
-			path += "?" + CustomQuery.Encode()
+		if s.customQuery != nil && len(s.customQuery) > 0 {
+			path += "?" + s.customQuery.Encode()
 		}
 	}
 
 	if strings.ToUpper(method) == "GET" || strings.ToUpper(method) == "DELETE" {
 		qs := make(url.Values)
 
-		if CustomQuery != nil && len(CustomQuery) > 0 {
-			for k, values := range CustomQuery {
+		if s.customQuery != nil && len(s.customQuery) > 0 {
+			for k, values := range s.customQuery {
 				for _, val := range values {
 					qs.Add(k, val)
 				}
@@ -56,7 +108,7 @@ func (s *ApiBackend) Call(method, path, key string, form *url.Values, params []b
 		}
 	}
 
-	req, err := s.NewRequest(method, path, key, "application/json", body, params)
+	req, err := s.NewRequest(method, path, s.key, "application/json", body, params)
 
 	if err != nil {
 		return err
@@ -74,14 +126,14 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
-	path = s.URL + path
+	path = s.baseUrl + path
 	req, err := http.NewRequest(method, path, body)
-	if LogLevel > 2 {
+	if s.logLevel > 2 {
 		log.Printf("Request to xpay is : \n %v\n", req)
 	}
 
 	if err != nil {
-		if LogLevel > 0 {
+		if s.logLevel > 0 {
 			log.Printf("Cannot create xpay request: %v\n", err)
 		}
 		return nil, err
@@ -99,10 +151,10 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 	log.Printf("RSA signature uri: %s", uri)
 	log.Printf("RSA signature time: %s", requestTime)
 
-	if len(AccountPrivateKey) > 0 {
-		sign, err := GenSign([]byte(dataToBeSign), []byte(AccountPrivateKey))
+	if len(s.accountPrivateKey) > 0 {
+		sign, err := GenSign([]byte(dataToBeSign), []byte(s.accountPrivateKey))
 		if err != nil {
-			if LogLevel > 0 {
+			if s.logLevel > 0 {
 				log.Printf("Cannot create RSA signature: %v\n", err)
 			}
 			return nil, err
@@ -116,14 +168,14 @@ func (s *ApiBackend) NewRequest(method, path, key, contentType string, body io.R
 	req.Header.Add("User-Agent", "xpay go sdk version:"+Version())
 	req.Header.Add("XPay-Client-User-Agent", OsInfo)
 	req.Header.Add("Content-Type", contentType)
-	req.Header.Add("Accept-Language", AcceptLanguage)
+	req.Header.Add("Accept-Language", s.acceptLanguage)
 
 	return req, nil
 }
 
 // Do 处理 http 请求
 func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
-	if LogLevel > 1 {
+	if s.logLevel > 1 {
 		log.Printf("Requesting %v %v \n", req.Method, req.URL.String())
 	}
 	retryTimes := 1
@@ -140,12 +192,12 @@ func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
 
 	for i := 0; i <= retryTimes; i++ {
 		req.Body = ioutil.NopCloser(bytes.NewBuffer(reqBody))
-		res, err := s.HTTPClient.Do(req)
-		if LogLevel > 0 {
+		res, err := s.httpClient.Do(req)
+		if s.logLevel > 0 {
 			log.Printf("Request to xpay completed in %v\n", time.Since(start))
 		}
 		if err != nil {
-			if LogLevel > 0 {
+			if s.logLevel > 0 {
 				log.Printf("Request to xpay failed: %v\n", err)
 			}
 			return err
@@ -157,7 +209,7 @@ func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
 
 		resBody, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			if LogLevel > 0 {
+			if s.logLevel > 0 {
 				log.Printf("Cannot parse xpay response: %v\n", err)
 			}
 			return err
@@ -171,7 +223,7 @@ func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
 
 			if e, ok := errMap["error"]; !ok {
 				err := errors.New(string(resBody))
-				if LogLevel > 0 {
+				if s.logLevel > 0 {
 					log.Printf("Unparsable error returned from xpay: %v\n", err)
 				}
 				return err
@@ -191,14 +243,14 @@ func (s *ApiBackend) Do(req *http.Request, v interface{}) error {
 					err.Param = param.(string)
 				}
 
-				if LogLevel > 0 {
+				if s.logLevel > 0 {
 					log.Printf("Error encountered from xpay: %v\n", err)
 				}
 				return err
 			}
 		}
 
-		if LogLevel > 2 {
+		if s.logLevel > 2 {
 			log.Printf("resBody from xpay API: \n%v\n", string(resBody))
 		}
 

@@ -9,12 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(params *xpay.OrderCreateParams) (*xpay.Order, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(params *xpay.OrderCreateParams) (*xpay.Order, error) {
@@ -30,12 +29,8 @@ func (c Client) New(params *xpay.OrderCreateParams) (*xpay.Order, error) {
 	}
 
 	order := &xpay.Order{}
-	err := c.B.Call("POST", "/orders", c.Key, nil, paramsString, order)
+	err := c.backend.Call("POST", "/orders", nil, paramsString, order)
 	return order, err
-}
-
-func Pay(id string, params *xpay.OrderPayParams) (*xpay.Order, error) {
-	return getC().Pay(id, params)
 }
 
 func (c Client) Pay(id string, params *xpay.OrderPayParams) (*xpay.Order, error) {
@@ -51,13 +46,10 @@ func (c Client) Pay(id string, params *xpay.OrderPayParams) (*xpay.Order, error)
 	}
 
 	order := &xpay.Order{}
-	err := c.B.Call("POST", fmt.Sprintf("/orders/%s/pay", id), c.Key, nil, paramsString, order)
+	err := c.backend.Call("POST", fmt.Sprintf("/orders/%s/pay", id), nil, paramsString, order)
 	return order, err
 }
 
-func Cancel(user, id string) (*xpay.Order, error) {
-	return getC().Cancel(user, id)
-}
 func (c Client) Cancel(user, id string) (*xpay.Order, error) {
 	params := struct {
 		Status string `json:"status"`
@@ -72,47 +64,32 @@ func (c Client) Cancel(user, id string) (*xpay.Order, error) {
 	}
 
 	order := &xpay.Order{}
-	err := c.B.Call("PUT", "/orders/"+id, c.Key, nil, paramsString, order)
+	err := c.backend.Call("PUT", "/orders/"+id, nil, paramsString, order)
 
 	return order, err
-}
-
-func Get(id string) (*xpay.Order, error) {
-	return getC().Get(id)
 }
 
 func (c Client) Get(id string) (*xpay.Order, error) {
 	order := &xpay.Order{}
 
-	err := c.B.Call("GET", "/orders/"+id, c.Key, nil, nil, order)
+	err := c.backend.Call("GET", "/orders/"+id, nil, nil, order)
 	return order, err
 }
 
-func List(params *xpay.PagingParams) (*xpay.OrderList, error) {
-	return getC().List(params)
-}
 func (c Client) List(params *xpay.PagingParams) (*xpay.OrderList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	orderList := &xpay.OrderList{}
-	err := c.B.Call("GET", "/orders", c.Key, body, nil, orderList)
+	err := c.backend.Call("GET", "/orders", body, nil, orderList)
 	return orderList, err
-}
-
-func Payment(orderID, chargeID string) (*xpay.Payment, error) {
-	return getC().Payment(orderID, chargeID)
 }
 
 func (c Client) Payment(orderID, chargeID string) (*xpay.Payment, error) {
 	payment := &xpay.Payment{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/payments/%s", orderID, chargeID), c.Key, nil, nil, payment)
+	err := c.backend.Call("GET", fmt.Sprintf("/orders/%s/payments/%s", orderID, chargeID), nil, nil, payment)
 	return payment, err
-}
-
-func PaymentList(orderID string, params *xpay.PagingParams) (*xpay.PaymentList, error) {
-	return getC().PaymentList(orderID, params)
 }
 
 func (c Client) PaymentList(orderID string, params *xpay.PagingParams) (*xpay.PaymentList, error) {
@@ -120,10 +97,6 @@ func (c Client) PaymentList(orderID string, params *xpay.PagingParams) (*xpay.Pa
 	params.Filters.AppendTo(body)
 
 	chargeList := &xpay.PaymentList{}
-	err := c.B.Call("GET", fmt.Sprintf("/orders/%s/payments", orderID), c.Key, body, nil, chargeList)
+	err := c.backend.Call("GET", fmt.Sprintf("/orders/%s/payments", orderID), body, nil, chargeList)
 	return chargeList, err
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

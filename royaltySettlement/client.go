@@ -9,16 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-func New(params *xpay.RoyaltySettlementCreateParams) (*xpay.RoyaltySettlement, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(params *xpay.RoyaltySettlementCreateParams) (*xpay.RoyaltySettlement, error) {
@@ -34,23 +29,15 @@ func (c Client) New(params *xpay.RoyaltySettlementCreateParams) (*xpay.RoyaltySe
 	}
 
 	royaltySettlement := &xpay.RoyaltySettlement{}
-	err := c.B.Call("POST", "/royalty_settlements", c.Key, nil, paramsString, royaltySettlement)
+	err := c.backend.Call("POST", "/royalty_settlements", nil, paramsString, royaltySettlement)
 	return royaltySettlement, err
-}
-
-func Get(royaltySettlementId string) (*xpay.RoyaltySettlement, error) {
-	return getC().Get(royaltySettlementId)
 }
 
 func (c Client) Get(royaltySettlementId string) (*xpay.RoyaltySettlement, error) {
 	royaltySettlement := &xpay.RoyaltySettlement{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/royalty_settlements/%s", royaltySettlementId), c.Key, nil, nil, royaltySettlement)
+	err := c.backend.Call("GET", fmt.Sprintf("/royalty_settlements/%s", royaltySettlementId), nil, nil, royaltySettlement)
 	return royaltySettlement, err
-}
-
-func Update(royaltySettlementId string, params xpay.RoyaltySettlementUpdateParams) (*xpay.RoyaltySettlement, error) {
-	return getC().Update(royaltySettlementId, params)
 }
 
 func (c Client) Update(royaltySettlementId string, params xpay.RoyaltySettlementUpdateParams) (*xpay.RoyaltySettlement, error) {
@@ -61,7 +48,7 @@ func (c Client) Update(royaltySettlementId string, params xpay.RoyaltySettlement
 
 	royaltySettlement := &xpay.RoyaltySettlement{}
 
-	err := c.B.Call("PUT", fmt.Sprintf("/royalty_settlements/%s", royaltySettlementId), c.Key, nil, paramsString, royaltySettlement)
+	err := c.backend.Call("PUT", fmt.Sprintf("/royalty_settlements/%s", royaltySettlementId), nil, paramsString, royaltySettlement)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -71,15 +58,11 @@ func (c Client) Update(royaltySettlementId string, params xpay.RoyaltySettlement
 	return royaltySettlement, err
 }
 
-func List(params *xpay.PagingParams) (*xpay.RoyaltySettlementList, error) {
-	return getC().List(params)
-}
-
 func (c Client) List(params *xpay.PagingParams) (*xpay.RoyaltySettlementList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	royaltySettlementList := &xpay.RoyaltySettlementList{}
-	err := c.B.Call("GET", "/royalty_settlements", c.Key, body, nil, royaltySettlementList)
+	err := c.backend.Call("GET", "/royalty_settlements", body, nil, royaltySettlementList)
 	return royaltySettlementList, err
 }

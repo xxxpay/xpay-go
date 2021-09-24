@@ -10,13 +10,14 @@ import (
 
 // Client 请求
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
+
+
 
 // New 创建签约
 // @param appId string
@@ -40,7 +41,7 @@ func (c Client) New(params *xpay.AgreementParams) (*xpay.Agreement, error) {
 	}
 
 	agreement := &xpay.Agreement{}
-	err := c.B.Call("POST", "/agreements", c.Key, nil, paramsString, agreement)
+	err := c.backend.Call("POST", "/agreements",  nil, paramsString, agreement)
 	return agreement, err
 }
 
@@ -54,7 +55,7 @@ func Get(agreementID string) (*xpay.Agreement, error) {
 // Get 查询签约对象
 func (c Client) Get(agreementID string) (*xpay.Agreement, error) {
 	agreement := &xpay.Agreement{}
-	err := c.B.Call("GET", fmt.Sprintf("/agreements/%s", agreementID), c.Key, nil, nil, agreement)
+	err := c.backend.Call("GET", fmt.Sprintf("/agreements/%s", agreementID),  nil, nil, agreement)
 	return agreement, err
 }
 
@@ -76,7 +77,7 @@ func (c Client) List(app, status string, params *xpay.PagingParams) (*xpay.Agree
 		body.Add("status", status)
 	}
 	agreements := &xpay.AgreementList{}
-	err := c.B.Call("GET", "/agreements", c.Key, body, nil, &agreements)
+	err := c.backend.Call("GET", "/agreements",  body, nil, &agreements)
 	return agreements, err
 }
 
@@ -96,7 +97,7 @@ func (c Client) Update(agreementID string, params *xpay.AgreementUpdateParams) (
 	}
 
 	agreement := &xpay.Agreement{}
-	err := c.B.Call("PUT", fmt.Sprintf("/agreements/%s", agreementID), c.Key, nil, paramsString, agreement)
+	err := c.backend.Call("PUT", fmt.Sprintf("/agreements/%s", agreementID),  nil, paramsString, agreement)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)

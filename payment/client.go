@@ -10,17 +10,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-// 发送 payment 请求
-func New(params *xpay.PaymentParams) (*xpay.Payment, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(params *xpay.PaymentParams) (*xpay.Payment, error) {
@@ -36,7 +30,7 @@ func (c Client) New(params *xpay.PaymentParams) (*xpay.Payment, error) {
 	}
 
 	payment := &xpay.Payment{}
-	errch := c.B.Call("POST", "/payments", c.Key, nil, paramsString, payment)
+	errch := c.backend.Call("POST", "/payments", nil, paramsString, payment)
 	if errch != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", errch)
@@ -50,16 +44,11 @@ func (c Client) New(params *xpay.PaymentParams) (*xpay.Payment, error) {
 
 }
 
-// 撤销charge，此接口仅接受线下 isv_scan、isv_wap、isv_qr 渠道的订单调用
-func Reverse(id string) (*xpay.Payment, error) {
-	return getC().Reverse(id)
-}
-
 func (c Client) Reverse(id string) (*xpay.Payment, error) {
 	var body *url.Values
 	body = &url.Values{}
 	payment := &xpay.Payment{}
-	err := c.B.Call("POST", "/payments/"+id+"/reverse", c.Key, body, nil, payment)
+	err := c.backend.Call("POST", "/payments/"+id+"/reverse", body, nil, payment)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Reverse Payment error: %v\n", err)
@@ -68,27 +57,17 @@ func (c Client) Reverse(id string) (*xpay.Payment, error) {
 	return payment, err
 }
 
-//查询指定 payment 对象
-func Get(id string) (*xpay.Payment, error) {
-	return getC().Get(id)
-}
-
 func (c Client) Get(id string) (*xpay.Payment, error) {
 	var body *url.Values
 	body = &url.Values{}
 	payment := &xpay.Payment{}
-	err := c.B.Call("GET", "/payments/"+id, c.Key, body, nil, payment)
+	err := c.backend.Call("GET", "/payments/"+id, body, nil, payment)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get Payment error: %v\n", err)
 		}
 	}
 	return payment, err
-}
-
-// 查询 payment 列表
-func List(appId string, params *xpay.PaymentListParams) *Iter {
-	return getC().List(appId, params)
 }
 
 func (c Client) List(appId string, params *xpay.PaymentListParams) *Iter {
@@ -113,7 +92,7 @@ func (c Client) List(appId string, params *xpay.PaymentListParams) *Iter {
 
 	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
 		list := &chargeList{}
-		err := c.B.Call("GET", "/payments", c.Key, &b, nil, list)
+		err := c.backend.Call("GET", "/payments", &b, nil, list)
 
 		ret := make([]interface{}, len(list.Values))
 		for i, v := range list.Values {

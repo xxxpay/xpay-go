@@ -10,12 +10,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(ch string, params *xpay.RefundParams) (*xpay.Refund, error) {
-	return getC().New(ch, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(ch string, params *xpay.RefundParams) (*xpay.Refund, error) {
@@ -32,24 +31,16 @@ func (c Client) New(ch string, params *xpay.RefundParams) (*xpay.Refund, error) 
 		log.Printf("params of refund request to xpay is :\n %v\n ", string(paramsString))
 	}
 	refund := &xpay.Refund{}
-	err := c.B.Call("POST", fmt.Sprintf("/payments/%v/refunds", ch), c.Key, nil, paramsString, refund)
+	err := c.backend.Call("POST", fmt.Sprintf("/payments/%v/refunds", ch), nil, paramsString, refund)
 	return refund, err
-}
-
-func Get(chid string, reid string) (*xpay.Refund, error) {
-	return getC().Get(chid, reid)
 }
 
 func (c Client) Get(chid string, reid string) (*xpay.Refund, error) {
 	var body *url.Values
 	body = &url.Values{}
 	refund := &xpay.Refund{}
-	err := c.B.Call("GET", fmt.Sprintf("/payments/%v/refunds/%v", chid, reid), c.Key, body, nil, refund)
+	err := c.backend.Call("GET", fmt.Sprintf("/payments/%v/refunds/%v", chid, reid), body, nil, refund)
 	return refund, err
-}
-
-func List(chid string, params *xpay.RefundListParams) *Iter {
-	return getC().List(chid, params)
 }
 
 func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
@@ -61,7 +52,7 @@ func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
 
 	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
 		list := &xpay.RefundList{}
-		err := c.B.Call("GET", fmt.Sprintf("/payments/%v/refunds", chid), c.Key, &b, nil, list)
+		err := c.backend.Call("GET", fmt.Sprintf("/payments/%v/refunds", chid), &b, nil, list)
 
 		ret := make([]interface{}, len(list.Values))
 		for i, v := range list.Values {
@@ -78,8 +69,4 @@ type Iter struct {
 
 func (i *Iter) Refund() *xpay.Refund {
 	return i.Current().(*xpay.Refund)
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

@@ -9,12 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 /*
@@ -22,14 +21,10 @@ func getC() Client {
 * @param params BatchRefundParams
 * @return BatchRefund
  */
-func New(params *xpay.BatchRefundParams) (*xpay.BatchRefund, error) {
-	return getC().New(params)
-}
-
 func (c Client) New(params *xpay.BatchRefundParams) (*xpay.BatchRefund, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	batchRefund := &xpay.BatchRefund{}
-	err := c.B.Call("POST", "/batch_refunds", c.Key, nil, paramsString, batchRefund)
+	err := c.backend.Call("POST", "/batch_refunds",  nil, paramsString, batchRefund)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("New BatchRefunds error: %v\n", err)
@@ -43,13 +38,9 @@ func (c Client) New(params *xpay.BatchRefundParams) (*xpay.BatchRefund, error) {
 * @param Id string
 * @return BatchRefund
  */
-func Get(Id string) (*xpay.BatchRefund, error) {
-	return getC().Get(Id)
-}
-
 func (c Client) Get(Id string) (*xpay.BatchRefund, error) {
 	batchRefund := &xpay.BatchRefund{}
-	err := c.B.Call("GET", fmt.Sprintf("/batch_refunds/%s", Id), c.Key, nil, nil, batchRefund)
+	err := c.backend.Call("GET", fmt.Sprintf("/batch_refunds/%s", Id),  nil, nil, batchRefund)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get BatchRefunds error: %v\n", err)
@@ -63,16 +54,12 @@ func (c Client) Get(Id string) (*xpay.BatchRefund, error) {
 * @param params PagingParams
 * @return BatchRefundlList
  */
-func List(params *xpay.PagingParams) (*xpay.BatchRefundlList, error) {
-	return getC().List(params)
-}
-
 func (c Client) List(params *xpay.PagingParams) (*xpay.BatchRefundlList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	batchRefundlList := &xpay.BatchRefundlList{}
-	err := c.B.Call("GET", "/batch_refunds", c.Key, body, nil, batchRefundlList)
+	err := c.backend.Call("GET", "/batch_refunds",  body, nil, batchRefundlList)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get BatchRefunds List error: %v\n", err)

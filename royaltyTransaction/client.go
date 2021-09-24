@@ -8,27 +8,18 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-func Get(royaltyTransacitonId string) (*xpay.RoyaltyTransaction, error) {
-	return getC().Get(royaltyTransacitonId)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) Get(royaltyTransacitonId string) (*xpay.RoyaltyTransaction, error) {
 	royaltyTransaction := &xpay.RoyaltyTransaction{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/royalty_transactions/%s", royaltyTransacitonId), c.Key, nil, nil, royaltyTransaction)
+	err := c.backend.Call("GET", fmt.Sprintf("/royalty_transactions/%s", royaltyTransacitonId), nil, nil, royaltyTransaction)
 	return royaltyTransaction, err
-}
-
-func List(params *xpay.PagingParams) (*xpay.RoyaltyTransactionList, error) {
-	return getC().List(params)
 }
 
 func (c Client) List(params *xpay.PagingParams) (*xpay.RoyaltyTransactionList, error) {
@@ -36,6 +27,6 @@ func (c Client) List(params *xpay.PagingParams) (*xpay.RoyaltyTransactionList, e
 	params.Filters.AppendTo(body)
 
 	royaltyTransactionList := &xpay.RoyaltyTransactionList{}
-	err := c.B.Call("GET", "/royalty_transactions", c.Key, body, nil, royaltyTransactionList)
+	err := c.backend.Call("GET", "/royalty_transactions", body, nil, royaltyTransactionList)
 	return royaltyTransactionList, err
 }

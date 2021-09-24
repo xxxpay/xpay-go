@@ -9,16 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-func New(appId, userId string, params *xpay.SettleAccountParams) (*xpay.SettleAccount, error) {
-	return getC().New(appId, userId, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(appId, userId string, params *xpay.SettleAccountParams) (*xpay.SettleAccount, error) {
@@ -34,41 +29,29 @@ func (c Client) New(appId, userId string, params *xpay.SettleAccountParams) (*xp
 	}
 
 	settle_account := &xpay.SettleAccount{}
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/users/%s/settle_accounts", appId, userId), c.Key, nil, paramsString, settle_account)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/users/%s/settle_accounts", appId, userId), nil, paramsString, settle_account)
 	return settle_account, err
-}
-
-func Get(appId, userId, settleAccountId string) (*xpay.SettleAccount, error) {
-	return getC().Get(appId, userId, settleAccountId)
 }
 
 func (c Client) Get(appId, userId, settleAccountId string) (*xpay.SettleAccount, error) {
 	settleAccount := &xpay.SettleAccount{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/users/%s/settle_accounts/%s", appId, userId, settleAccountId), c.Key, nil, nil, settleAccount)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/users/%s/settle_accounts/%s", appId, userId, settleAccountId), nil, nil, settleAccount)
 	return settleAccount, err
-}
-
-func List(appId, userId string, params *xpay.PagingParams) (*xpay.SettleAccountList, error) {
-	return getC().List(appId, userId, params)
 }
 func (c Client) List(appId, userId string, params *xpay.PagingParams) (*xpay.SettleAccountList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	settleAccountList := &xpay.SettleAccountList{}
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/users/%s/settle_accounts", appId, userId), c.Key, body, nil, settleAccountList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/users/%s/settle_accounts", appId, userId), body, nil, settleAccountList)
 	return settleAccountList, err
-}
-
-func Delete(appId, userId, settleAccountId string) (*xpay.DeleteResult, error) {
-	return getC().Delete(appId, userId, settleAccountId)
 }
 
 func (c Client) Delete(appId, userId, settleAccountId string) (*xpay.DeleteResult, error) {
 	result := &xpay.DeleteResult{}
 
-	err := c.B.Call("DELETE", fmt.Sprintf("/apps/%s/users/%s/settle_accounts/%s", appId, userId, settleAccountId), c.Key, nil, nil, result)
+	err := c.backend.Call("DELETE", fmt.Sprintf("/apps/%s/users/%s/settle_accounts/%s", appId, userId, settleAccountId), nil, nil, result)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)

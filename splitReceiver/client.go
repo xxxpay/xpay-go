@@ -11,12 +11,11 @@ import (
 // Client 分账客户端
 // 暂时只支持微信渠道特约商户
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // New 添加分账接收方
@@ -30,11 +29,6 @@ func getC() Client {
 // - 微信分账接收方类型是`PERSONAL_WECHATID`时，是个人微信号
 // - 微信分账接收方类型是`PERSONAL_OPENID`时，是个人`openid`
 // - 微信分账接收方类型是`PERSONAL_SUB_OPENID`时，是个人`sub_openid`
-func New(params *xpay.SplitReceiverParams) (*xpay.SplitReceiver, error) {
-	return getC().New(params)
-}
-
-// New 添加分账接收方
 func (c Client) New(params *xpay.SplitReceiverParams) (*xpay.SplitReceiver, error) {
 	paramsString, errs := xpay.JsonEncode(params)
 	if errs != nil {
@@ -48,20 +42,15 @@ func (c Client) New(params *xpay.SplitReceiverParams) (*xpay.SplitReceiver, erro
 	}
 
 	splitReceiver := &xpay.SplitReceiver{}
-	err := c.B.Call("POST", fmt.Sprintf("/split_receivers"), c.Key, nil, paramsString, splitReceiver)
+	err := c.backend.Call("POST", fmt.Sprintf("/split_receivers"), nil, paramsString, splitReceiver)
 	return splitReceiver, err
-}
-
-// Get 查询分账接收方
-func Get(id string) (*xpay.SplitReceiver, error) {
-	return getC().Get(id)
 }
 
 // Get 查询分账接收方
 func (c Client) Get(id string) (*xpay.SplitReceiver, error) {
 	splitReceiver := &xpay.SplitReceiver{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/split_receivers/%s", id), c.Key, nil, nil, splitReceiver)
+	err := c.backend.Call("GET", fmt.Sprintf("/split_receivers/%s", id), nil, nil, splitReceiver)
 	return splitReceiver, err
 }
 
@@ -71,11 +60,6 @@ func (c Client) Get(id string) (*xpay.SplitReceiver, error) {
 // | app | string | 20 | required | 无 | App ID。
 // | type | string | [1~32] | optional | 无 | 分账接收方类型
 // | channel | string | [`wx`、`wx_lite`、`wx_pub`、`wx_wap`、`wx_pub_qr`、`wx_pub_scan`] | optional | 无 | 暂时只支持微信渠道
-func List(app, typ, channel string, params *xpay.PagingParams) (xpay.SplitReceiverList, error) {
-	return getC().List(app, typ, channel, params)
-}
-
-// List 查询分账接收方列表
 func (c Client) List(app, typ, channel string, params *xpay.PagingParams) (xpay.SplitReceiverList, error) {
 	values := &url.Values{}
 	values.Add("app", app)
@@ -88,19 +72,14 @@ func (c Client) List(app, typ, channel string, params *xpay.PagingParams) (xpay.
 	params.Filters.AppendTo(values)
 
 	splitReceiverList := xpay.SplitReceiverList{}
-	err := c.B.Call("GET", "/split_receivers", c.Key, values, nil, &splitReceiverList)
+	err := c.backend.Call("GET", "/split_receivers", values, nil, &splitReceiverList)
 	return splitReceiverList, err
-}
-
-// Delete 删除分账接收方
-func Delete(id string) (*xpay.DeleteResult, error) {
-	return getC().Delete(id)
 }
 
 // Delete 删除分账接收方
 func (c Client) Delete(id string) (*xpay.DeleteResult, error) {
 	deleteResult := &xpay.DeleteResult{}
 
-	err := c.B.Call("DELETE", fmt.Sprintf("/split_receivers/%s", id), c.Key, nil, nil, deleteResult)
+	err := c.backend.Call("DELETE", fmt.Sprintf("/split_receivers/%s", id), nil, nil, deleteResult)
 	return deleteResult, err
 }

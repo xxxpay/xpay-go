@@ -8,12 +8,11 @@ import (
 
 // Client 支行客户端
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // List 按银行编号和省市查询支行信息列表
@@ -23,11 +22,6 @@ func getC() Client {
 // prov | string | 1~20 | required | 无 | 省份。
 // city | string | 1~40 | required | 无 | 城市。
 // channel | string | [`chanpay`] | required | 无 | 渠道。
-func List(app, openBankCode, prov, city, channel string) (xpay.SubBankList, error) {
-	return getC().List(app, openBankCode, prov, city, channel)
-}
-
-// List 按银行编号和省市查询支行信息列表
 func (c Client) List(app, openBankCode, prov, city, channel string) (xpay.SubBankList, error) {
 	values := &url.Values{}
 	values.Add("app", app)
@@ -37,6 +31,6 @@ func (c Client) List(app, openBankCode, prov, city, channel string) (xpay.SubBan
 	values.Add("channel", channel)
 
 	subBankList := xpay.SubBankList{}
-	err := c.B.Call("GET", "/sub_banks", c.Key, values, nil, &subBankList)
+	err := c.backend.Call("GET", "/sub_banks", values, nil, &subBankList)
 	return subBankList, err
 }

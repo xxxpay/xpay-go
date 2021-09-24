@@ -9,24 +9,20 @@ import (
 
 // Client 分账明细客户端
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // Get 查询分账明细
-func Get(id string) (*xpay.ProfitTransaction, error) {
-	return getC().Get(id)
-}
 
 // Get 查询分账明细
 func (c Client) Get(id string) (*xpay.ProfitTransaction, error) {
 	profitTransaction := &xpay.ProfitTransaction{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/profit_transactions/%s", id), c.Key, nil, nil, profitTransaction)
+	err := c.backend.Call("GET", fmt.Sprintf("/profit_transactions/%s", id), nil, nil, profitTransaction)
 	return profitTransaction, err
 }
 
@@ -37,11 +33,6 @@ func (c Client) Get(id string) (*xpay.ProfitTransaction, error) {
 // | split_profit| string | 17 | optional | 无 | 分账ID
 // | split_receiver|  string | 19 | optional | 无 | 分账接收方ID
 // | status | string | - | optional | 无 | 分账明细状态
-func List(app, splitProfit, splitReceiver, status string, params *xpay.PagingParams) (xpay.ProfitTransactionList, error) {
-	return getC().List(app, splitProfit, splitReceiver, status, params)
-}
-
-// List 查询分账明细列表
 func (c Client) List(app, splitProfit, splitReceiver, status string, params *xpay.PagingParams) (xpay.ProfitTransactionList, error) {
 	values := &url.Values{}
 	values.Add("app", app)
@@ -57,6 +48,6 @@ func (c Client) List(app, splitProfit, splitReceiver, status string, params *xpa
 	params.Filters.AppendTo(values)
 
 	profitTransactionList := xpay.ProfitTransactionList{}
-	err := c.B.Call("GET", "/profit_transactions", c.Key, values, nil, &profitTransactionList)
+	err := c.backend.Call("GET", "/profit_transactions", values, nil, &profitTransactionList)
 	return profitTransactionList, err
 }

@@ -2,7 +2,6 @@ package xpay
 
 import (
 	"bytes"
-	"net/http"
 	"net/url"
 	"os/exec"
 	"runtime"
@@ -12,78 +11,36 @@ import (
 
 const (
 	// 当前版本的api生成生成时间
-	apiVersion = "2017-06-30"
+	apiVersion = "2021-06-30"
 	// httpclient等待时间
-	defaultHTTPTimeout                  = 80 * time.Second
-	TotalBackends                       = 1
-	APIBackend         SupportedBackend = "api"
+	defaultHTTPTimeout = 80 * time.Second
 )
 
 var (
 	// 当前版本的api地址
 	APIBase = "https://api.xpay.ucfish.com/xpay/v2"
-	// 用户自定义附加Query参数
-	CustomQuery = make(url.Values)
 	// 默认错误信息返回语言
 	AcceptLanguage = "zh-CN"
 	// xpay api统一需要通过Authentication（http BasicAuth），需要在调用时赋值
 	Key string
-
 	// loglevel 是 debug 模式开关.
 	// 0: no logging
 	// 1: errors only
 	// 2: errors + informational (default)
 	// 3: errors + informational + debug
-	LogLevel = 2
-
-	//不用默认的defaultClient，自定义httpClient
-	httpClient        = &http.Client{Timeout: defaultHTTPTimeout}
-	backends          Backends
+	LogLevel          = 2
 	AccountPrivateKey string
 	OsInfo            string
 )
 
-type SupportedBackend string
-
 // 定义统一后端处理接口
 type Backend interface {
-	Call(method, path, key string, body *url.Values, params []byte, v interface{}) error
+	Call(method, path string, body *url.Values, params []byte, v interface{}) error
 }
 
 // 获取当前sdk的版本
 func Version() string {
 	return "3.2.1"
-}
-
-/*2016-02-16 当前情况下没有代码调用了该函数
-func SetHttpClient(client *http.Client) {
-	httpClient = client
-}*/
-
-type Backends struct {
-	API Backend
-}
-
-// 通过不同的参数获取不同的后端对象
-func GetBackend(backend SupportedBackend) Backend {
-	var ret Backend
-	switch backend {
-	case APIBackend:
-		if backends.API == nil {
-			backends.API = ApiBackend{backend, APIBase, httpClient}
-		}
-
-		ret = backends.API
-	}
-	return ret
-}
-
-//设定后端处理对象
-func SetBackend(backend SupportedBackend, b Backend) {
-	switch backend {
-	case APIBackend:
-		backends.API = b
-	}
 }
 
 func init() {
@@ -98,7 +55,7 @@ func init() {
 		var stderr bytes.Buffer
 		cmd.Stdout = &out
 		cmd.Stderr = &stderr
-		cmd.Run()
+		_ = cmd.Run()
 		uname = out.String()
 	}
 	m := map[string]interface{}{

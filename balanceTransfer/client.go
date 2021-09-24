@@ -9,16 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-func New(appId string, params *xpay.BalanceTransferParams) (*xpay.BalanceTransfer, error) {
-	return getC().New(appId, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(appId string, params *xpay.BalanceTransferParams) (*xpay.BalanceTransfer, error) {
@@ -28,7 +23,7 @@ func (c Client) New(appId string, params *xpay.BalanceTransferParams) (*xpay.Bal
 	}
 	balanceTransfer := &xpay.BalanceTransfer{}
 
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/balance_transfers", appId), c.Key, nil, paramsString, balanceTransfer)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/balance_transfers", appId), nil, paramsString, balanceTransfer)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Balance Transfer error: %v\n", err)
@@ -37,19 +32,11 @@ func (c Client) New(appId string, params *xpay.BalanceTransferParams) (*xpay.Bal
 	return balanceTransfer, err
 }
 
-func Get(appId, balanceTransferId string) (*xpay.BalanceTransfer, error) {
-	return getC().Get(appId, balanceTransferId)
-}
-
 func (c Client) Get(appId, balanceTransferID string) (*xpay.BalanceTransfer, error) {
 	balanceTransfer := &xpay.BalanceTransfer{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/balance_transfers/%s", appId, balanceTransferID), c.Key, nil, nil, balanceTransfer)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/balance_transfers/%s", appId, balanceTransferID), nil, nil, balanceTransfer)
 	return balanceTransfer, err
-}
-
-func List(orderId string, params *xpay.PagingParams) (*xpay.BalanceTransferList, error) {
-	return getC().List(orderId, params)
 }
 
 func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.BalanceTransferList, error) {
@@ -57,6 +44,6 @@ func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.BalanceTran
 	params.Filters.AppendTo(body)
 	balanceTransferList := &xpay.BalanceTransferList{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/balance_transfers", appID), c.Key, body, nil, balanceTransferList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/balance_transfers", appID), body, nil, balanceTransferList)
 	return balanceTransferList, err
 }

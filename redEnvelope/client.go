@@ -8,12 +8,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(params *xpay.RedEnvelopeParams) (*xpay.RedEnvelope, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(params *xpay.RedEnvelopeParams) (*xpay.RedEnvelope, error) {
@@ -28,24 +27,16 @@ func (c Client) New(params *xpay.RedEnvelopeParams) (*xpay.RedEnvelope, error) {
 		log.Printf("params of redEnvelope request to xpay is :\n %v\n ", string(paramsString))
 	}
 	redEnvelope := &xpay.RedEnvelope{}
-	err := c.B.Call("POST", "/red_envelopes", c.Key, nil, paramsString, redEnvelope)
+	err := c.backend.Call("POST", "/red_envelopes", nil, paramsString, redEnvelope)
 	return redEnvelope, err
-}
-
-func Get(id string) (*xpay.RedEnvelope, error) {
-	return getC().Get(id)
 }
 
 func (c Client) Get(id string) (*xpay.RedEnvelope, error) {
 	var body *url.Values
 	body = &url.Values{}
 	redEnvelope := &xpay.RedEnvelope{}
-	err := c.B.Call("GET", "/red_envelopes/"+id, c.Key, body, nil, redEnvelope)
+	err := c.backend.Call("GET", "/red_envelopes/"+id, body, nil, redEnvelope)
 	return redEnvelope, err
-}
-
-func List(params *xpay.RedEnvelopeListParams) *Iter {
-	return getC().List(params)
 }
 
 func (c Client) List(params *xpay.RedEnvelopeListParams) *Iter {
@@ -69,7 +60,7 @@ func (c Client) List(params *xpay.RedEnvelopeListParams) *Iter {
 
 	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
 		list := &redEnvelopeList{}
-		err := c.B.Call("GET", "/red_envelopes", c.Key, &b, nil, list)
+		err := c.backend.Call("GET", "/red_envelopes", &b, nil, list)
 
 		ret := make([]interface{}, len(list.Values))
 		for i, v := range list.Values {
@@ -86,8 +77,4 @@ type Iter struct {
 
 func (i *Iter) RedEnvelope() *xpay.RedEnvelope {
 	return i.Current().(*xpay.RedEnvelope)
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

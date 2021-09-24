@@ -9,12 +9,11 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func New(appId string, params *xpay.RechargeParams) (*xpay.Recharge, error) {
-	return getC().New(appId, params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 func (c Client) New(appId string, params *xpay.RechargeParams) (*xpay.Recharge, error) {
@@ -30,23 +29,15 @@ func (c Client) New(appId string, params *xpay.RechargeParams) (*xpay.Recharge, 
 	}
 
 	recharge := &xpay.Recharge{}
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/recharges", appId), c.Key, nil, paramsString, recharge)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/recharges", appId), nil, paramsString, recharge)
 	return recharge, err
-}
-
-func Get(appID, rechargeID string) (*xpay.Recharge, error) {
-	return getC().Get(appID, rechargeID)
 }
 
 func (c Client) Get(appID, rechargeID string) (*xpay.Recharge, error) {
 	recharge := &xpay.Recharge{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s", appID, rechargeID), c.Key, nil, nil, recharge)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/recharges/%s", appID, rechargeID), nil, nil, recharge)
 	return recharge, err
-}
-
-func List(appID string, params *xpay.PagingParams) (*xpay.RechargeList, error) {
-	return getC().List(appID, params)
 }
 
 func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.RechargeList, error) {
@@ -54,10 +45,6 @@ func (c Client) List(appID string, params *xpay.PagingParams) (*xpay.RechargeLis
 	params.Filters.AppendTo(body)
 	rechargeList := &xpay.RechargeList{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/recharges", appID), c.Key, body, nil, rechargeList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/recharges", appID), body, nil, rechargeList)
 	return rechargeList, err
-}
-
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
 }

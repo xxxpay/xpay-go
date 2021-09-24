@@ -11,17 +11,11 @@ import (
 // Client 分账客户端
 // 暂时只支持微信渠道特约商户
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
-}
-
-// New 请求分账
-func New(params *xpay.SplitProfitParams) (*xpay.SplitProfit, error) {
-	return getC().New(params)
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // New 请求分账
@@ -38,20 +32,15 @@ func (c Client) New(params *xpay.SplitProfitParams) (*xpay.SplitProfit, error) {
 	}
 
 	splitProfit := &xpay.SplitProfit{}
-	err := c.B.Call("POST", fmt.Sprintf("/split_profits"), c.Key, nil, paramsString, splitProfit)
+	err := c.backend.Call("POST", fmt.Sprintf("/split_profits"), nil, paramsString, splitProfit)
 	return splitProfit, err
-}
-
-// Get 查询分账
-func Get(id string) (*xpay.SplitProfit, error) {
-	return getC().Get(id)
 }
 
 // Get 查询分账
 func (c Client) Get(id string) (*xpay.SplitProfit, error) {
 	splitProfit := &xpay.SplitProfit{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/split_profits/%s", id), c.Key, nil, nil, splitProfit)
+	err := c.backend.Call("GET", fmt.Sprintf("/split_profits/%s", id), nil, nil, splitProfit)
 	return splitProfit, err
 }
 
@@ -62,11 +51,6 @@ func (c Client) Get(id string) (*xpay.SplitProfit, error) {
 // | payment | string |  | optional | 无 | xpay 交易成功的 payment ID
 // | type | string | optional | 无 | 分账类型: `split_normal` 为普通分账,`split_return` 为完结分账
 // | channel | string | [`wx`、`wx_lite`、`wx_pub`、`wx_wap`、`wx_pub_qr`、`wx_pub_scan`] | optional | 无 | 暂时只支持微信渠道
-func List(app, payment, typ, channel string, params *xpay.PagingParams) (xpay.SplitProfitList, error) {
-	return getC().List(app, payment, typ, channel, params)
-}
-
-// List 查询分账列表
 func (c Client) List(app, payment, typ, channel string, params *xpay.PagingParams) (xpay.SplitProfitList, error) {
 	values := &url.Values{}
 	values.Add("app", app)
@@ -82,6 +66,6 @@ func (c Client) List(app, payment, typ, channel string, params *xpay.PagingParam
 	params.Filters.AppendTo(values)
 
 	splitProfitList := xpay.SplitProfitList{}
-	err := c.B.Call("GET", "/split_profits", c.Key, values, nil, &splitProfitList)
+	err := c.backend.Call("GET", "/split_profits", values, nil, &splitProfitList)
 	return splitProfitList, err
 }

@@ -9,19 +9,14 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 // 创建分润模板
-func New(params *xpay.RoyaltyTmplParams) (*xpay.RoyaltyTmpl, error) {
-	return getC().New(params)
-}
-
 func (c Client) New(params *xpay.RoyaltyTmplParams) (*xpay.RoyaltyTmpl, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -30,7 +25,7 @@ func (c Client) New(params *xpay.RoyaltyTmplParams) (*xpay.RoyaltyTmpl, error) {
 
 	royaltyTemplate := &xpay.RoyaltyTmpl{}
 
-	err := c.B.Call("POST", "/royalty_templates", c.Key, nil, paramsString, royaltyTemplate)
+	err := c.backend.Call("POST", "/royalty_templates", nil, paramsString, royaltyTemplate)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -42,16 +37,12 @@ func (c Client) New(params *xpay.RoyaltyTmplParams) (*xpay.RoyaltyTmpl, error) {
 }
 
 //查询指定的分润模板
-func Get(royaltyTmplId string) (*xpay.RoyaltyTmpl, error) {
-	return getC().Get(royaltyTmplId)
-}
-
 func (c Client) Get(royaltyTmplId string) (*xpay.RoyaltyTmpl, error) {
 	var body *url.Values
 	body = &url.Values{}
 	royaltyTmpl := &xpay.RoyaltyTmpl{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), c.Key, body, nil, royaltyTmpl)
+	err := c.backend.Call("GET", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), body, nil, royaltyTmpl)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get royalty Template error: %v\n", err)
@@ -61,10 +52,6 @@ func (c Client) Get(royaltyTmplId string) (*xpay.RoyaltyTmpl, error) {
 }
 
 //更新分润模板
-func Update(royaltyTmplId string, params *xpay.RoyaltyTmplUpdateParams) (*xpay.RoyaltyTmpl, error) {
-	return getC().Update(royaltyTmplId, params)
-}
-
 func (c Client) Update(royaltyTmplId string, params *xpay.RoyaltyTmplUpdateParams) (*xpay.RoyaltyTmpl, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -73,7 +60,7 @@ func (c Client) Update(royaltyTmplId string, params *xpay.RoyaltyTmplUpdateParam
 
 	royaltyTmpl := &xpay.RoyaltyTmpl{}
 
-	err := c.B.Call("PUT", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), c.Key, nil, paramsString, royaltyTmpl)
+	err := c.backend.Call("PUT", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), nil, paramsString, royaltyTmpl)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -84,15 +71,10 @@ func (c Client) Update(royaltyTmplId string, params *xpay.RoyaltyTmplUpdateParam
 }
 
 //删除分润模板
-
-func Delete(royaltyTmplId string) (*xpay.DeleteResult, error) {
-	return getC().Delete(royaltyTmplId)
-}
-
 func (c Client) Delete(royaltyTmplId string) (*xpay.DeleteResult, error) {
 	result := &xpay.DeleteResult{}
 
-	err := c.B.Call("DELETE", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), c.Key, nil, nil, result)
+	err := c.backend.Call("DELETE", fmt.Sprintf("/royalty_templates/%s", royaltyTmplId), nil, nil, result)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Delete Royalty Template error: %v\n", err)
@@ -102,14 +84,11 @@ func (c Client) Delete(royaltyTmplId string) (*xpay.DeleteResult, error) {
 }
 
 //查询分润模板列表
-func List(params *xpay.PagingParams) (*xpay.RoyaltyTmplList, error) {
-	return getC().List(params)
-}
 func (c Client) List(params *xpay.PagingParams) (*xpay.RoyaltyTmplList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	royaltyTmplList := &xpay.RoyaltyTmplList{}
-	err := c.B.Call("GET", "/royalty_templates", c.Key, body, nil, royaltyTmplList)
+	err := c.backend.Call("GET", "/royalty_templates", body, nil, royaltyTmplList)
 	return royaltyTmplList, err
 }

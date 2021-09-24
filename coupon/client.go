@@ -9,19 +9,14 @@ import (
 )
 
 type Client struct {
-	B   xpay.Backend
-	Key string
+	backend xpay.Backend
 }
 
-func getC() Client {
-	return Client{xpay.GetBackend(xpay.APIBackend), xpay.Key}
+func NewClient(backend xpay.Backend) Client {
+	return Client{backend: backend}
 }
 
 //创建优惠券
-func New(appId, userId string, params *xpay.CouponParams) (*xpay.Coupon, error) {
-	return getC().New(appId, userId, params)
-}
-
 func (c Client) New(appId, userId string, params *xpay.CouponParams) (*xpay.Coupon, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -30,7 +25,7 @@ func (c Client) New(appId, userId string, params *xpay.CouponParams) (*xpay.Coup
 
 	coupon := &xpay.Coupon{}
 
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/users/%s/coupons", appId, userId), c.Key, nil, paramsString, coupon)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/users/%s/coupons", appId, userId), nil, paramsString, coupon)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -41,10 +36,6 @@ func (c Client) New(appId, userId string, params *xpay.CouponParams) (*xpay.Coup
 }
 
 //批量创建优惠券
-func BatchNew(appId, couponTmplId string, params *xpay.BatchCouponParams) (*xpay.CouponList, error) {
-	return getC().BatchNew(appId, couponTmplId, params)
-}
-
 func (c Client) BatchNew(appId, couponTmplId string, params *xpay.BatchCouponParams) (*xpay.CouponList, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -53,7 +44,7 @@ func (c Client) BatchNew(appId, couponTmplId string, params *xpay.BatchCouponPar
 
 	couponList := &xpay.CouponList{}
 
-	err := c.B.Call("POST", fmt.Sprintf("/apps/%s/coupon_templates/%s/coupons", appId, couponTmplId), c.Key, nil, paramsString, couponList)
+	err := c.backend.Call("POST", fmt.Sprintf("/apps/%s/coupon_templates/%s/coupons", appId, couponTmplId), nil, paramsString, couponList)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -64,10 +55,6 @@ func (c Client) BatchNew(appId, couponTmplId string, params *xpay.BatchCouponPar
 }
 
 //更新优惠券
-func Update(appId, userId, couponId string, params *xpay.CouponUpdateParams) (*xpay.Coupon, error) {
-	return getC().Update(appId, userId, couponId, params)
-}
-
 func (c Client) Update(appId, userId, couponId string, params *xpay.CouponUpdateParams) (*xpay.Coupon, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -76,7 +63,7 @@ func (c Client) Update(appId, userId, couponId string, params *xpay.CouponUpdate
 
 	coupon := &xpay.Coupon{}
 
-	err := c.B.Call("PUT", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), c.Key, nil, paramsString, coupon)
+	err := c.backend.Call("PUT", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), nil, paramsString, coupon)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
@@ -87,14 +74,10 @@ func (c Client) Update(appId, userId, couponId string, params *xpay.CouponUpdate
 }
 
 //删除优惠券
-func Delete(appId, userId, couponId string) (*xpay.DeleteResult, error) {
-	return getC().Delete(appId, userId, couponId)
-}
-
 func (c Client) Delete(appId, userId, couponId string) (*xpay.DeleteResult, error) {
 	result := &xpay.DeleteResult{}
 
-	err := c.B.Call("DELETE", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), c.Key, nil, nil, result)
+	err := c.backend.Call("DELETE", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), nil, nil, result)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Delete Coupon Template error: %v\n", err)
@@ -104,16 +87,12 @@ func (c Client) Delete(appId, userId, couponId string) (*xpay.DeleteResult, erro
 }
 
 //查询指定的优惠券模板
-func Get(appId, userId, couponId string) (*xpay.Coupon, error) {
-	return getC().Get(appId, userId, couponId)
-}
-
 func (c Client) Get(appId, userId, couponId string) (*xpay.Coupon, error) {
 	var body *url.Values
 	body = &url.Values{}
 	coupon := &xpay.Coupon{}
 
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), c.Key, body, nil, coupon)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/users/%s/coupons/%s", appId, userId, couponId), body, nil, coupon)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get Coupon error: %v\n", err)
@@ -123,16 +102,12 @@ func (c Client) Get(appId, userId, couponId string) (*xpay.Coupon, error) {
 }
 
 //用户的优惠券列表
-func UserList(appId, userId string, params *xpay.PagingParams) (*xpay.CouponList, error) {
-	return getC().UserList(appId, userId, params)
-}
-
 func (c Client) UserList(appId, userId string, params *xpay.PagingParams) (*xpay.CouponList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
 
 	couponList := &xpay.CouponList{}
-	err := c.B.Call("GET", fmt.Sprintf("/apps/%s/users/%s/coupons", appId, userId), c.Key, body, nil, couponList)
+	err := c.backend.Call("GET", fmt.Sprintf("/apps/%s/users/%s/coupons", appId, userId), body, nil, couponList)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("Get Coupon error: %v\n", err)
