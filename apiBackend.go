@@ -16,7 +16,6 @@ import (
 
 // ApiBackend api相关的后端类型
 type ApiBackend struct {
-	Type       SupportedBackend
 	URL        string
 	HTTPClient *http.Client
 }
