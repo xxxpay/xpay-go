@@ -30,6 +30,7 @@ type ApiBackendOption func(*ApiBackend)
 func NewApiBackend(options ...ApiBackendOption) *ApiBackend {
 	backend := &ApiBackend{
 		baseUrl:           APIBase,
+		customQuery:       CustomQuery,
 		acceptLanguage:    AcceptLanguage,
 		key:               Key,
 		logLevel:          LogLevel,

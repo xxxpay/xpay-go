@@ -21,6 +21,7 @@ var (
 	APIBase = "https://api.xpay.ucfish.com/xpay/v2"
 	// 默认错误信息返回语言
 	AcceptLanguage = "zh-CN"
+	CustomQuery    = make(url.Values)
 	// xpay api统一需要通过Authentication（http BasicAuth），需要在调用时赋值
 	Key string
 	// loglevel 是 debug 模式开关.
