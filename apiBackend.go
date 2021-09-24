@@ -73,6 +73,12 @@ func WithAccountPrivateKey(key string) ApiBackendOption {
 	}
 }
 
+func WithKey(key string) ApiBackendOption {
+	return func(backend *ApiBackend) {
+		backend.key = key
+	}
+}
+
 // Call 后端处理请求方法
 func (s *ApiBackend) Call(method, path string, form *url.Values, params []byte, v interface{}) error {
 	var body io.Reader
