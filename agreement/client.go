@@ -17,17 +17,9 @@ func NewClient(backend xpay.Backend) Client {
 	return Client{backend: backend}
 }
 
-
-
 // New 创建签约
-// @param appId string
 // @param params AgreementParams
 // @return Agreement
-func New(params *xpay.AgreementParams) (*xpay.Agreement, error) {
-	return getC().New(params)
-}
-
-// New 创建签约
 func (c Client) New(params *xpay.AgreementParams) (*xpay.Agreement, error) {
 	paramsString, errs := xpay.JsonEncode(params)
 	if errs != nil {
@@ -41,21 +33,16 @@ func (c Client) New(params *xpay.AgreementParams) (*xpay.Agreement, error) {
 	}
 
 	agreement := &xpay.Agreement{}
-	err := c.backend.Call("POST", "/agreements",  nil, paramsString, agreement)
+	err := c.backend.Call("POST", "/agreements", nil, paramsString, agreement)
 	return agreement, err
 }
 
 // Get 查询签约对象
 // @param agreementID 签约对象 ID
 // @return Agreement
-func Get(agreementID string) (*xpay.Agreement, error) {
-	return getC().Get(agreementID)
-}
-
-// Get 查询签约对象
 func (c Client) Get(agreementID string) (*xpay.Agreement, error) {
 	agreement := &xpay.Agreement{}
-	err := c.backend.Call("GET", fmt.Sprintf("/agreements/%s", agreementID),  nil, nil, agreement)
+	err := c.backend.Call("GET", fmt.Sprintf("/agreements/%s", agreementID), nil, nil, agreement)
 	return agreement, err
 }
 
@@ -64,11 +51,6 @@ func (c Client) Get(agreementID string) (*xpay.Agreement, error) {
 // @param status string
 // @param params PagingParams
 // @return AgreementList
-func List(app, status string, params *xpay.PagingParams) (*xpay.AgreementList, error) {
-	return getC().List(app, status, params)
-}
-
-// List 查询签约对象列表
 func (c Client) List(app, status string, params *xpay.PagingParams) (*xpay.AgreementList, error) {
 	body := &url.Values{}
 	params.Filters.AppendTo(body)
@@ -77,7 +59,7 @@ func (c Client) List(app, status string, params *xpay.PagingParams) (*xpay.Agree
 		body.Add("status", status)
 	}
 	agreements := &xpay.AgreementList{}
-	err := c.backend.Call("GET", "/agreements",  body, nil, &agreements)
+	err := c.backend.Call("GET", "/agreements", body, nil, &agreements)
 	return agreements, err
 }
 
@@ -85,11 +67,6 @@ func (c Client) List(app, status string, params *xpay.PagingParams) (*xpay.Agree
 // @param agreementID string
 // @param params AgreementUpdateParams
 // @return Agreement
-func Update(agreementID string, params *xpay.AgreementUpdateParams) (*xpay.Agreement, error) {
-	return getC().Update(agreementID, params)
-}
-
-// Update 更新子商户对象
 func (c Client) Update(agreementID string, params *xpay.AgreementUpdateParams) (*xpay.Agreement, error) {
 	paramsString, _ := xpay.JsonEncode(params)
 	if xpay.LogLevel > 2 {
@@ -97,7 +74,7 @@ func (c Client) Update(agreementID string, params *xpay.AgreementUpdateParams) (
 	}
 
 	agreement := &xpay.Agreement{}
-	err := c.backend.Call("PUT", fmt.Sprintf("/agreements/%s", agreementID),  nil, paramsString, agreement)
+	err := c.backend.Call("PUT", fmt.Sprintf("/agreements/%s", agreementID), nil, paramsString, agreement)
 	if err != nil {
 		if xpay.LogLevel > 0 {
 			log.Printf("%v\n", err)
