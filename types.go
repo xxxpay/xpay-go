@@ -53,6 +53,10 @@ type (
 		Created int64
 	}
 
+	PaymentPayParams struct {
+		Token string `json:"token"`
+	}
+
 	// Payment 数据类型
 	Payment struct {
 		ID              string                 `json:"id"`
@@ -110,23 +114,23 @@ type (
 
 	// Refund 付款退款数据类型
 	Refund struct {
-		ID              string                 `json:"id"`
-		Object          string                 `json:"object"`
-		Order_no        string                 `json:"order_no"`
-		Amount          uint64                 `json:"amount"`
-		Succeed         bool                   `json:"succeed"`
-		Status          string                 `json:"status"`
-		Created         uint64                 `json:"created"`
-		Time_succeed    uint64                 `json:"time_succeed"`
-		Description     string                 `json:"description"`
-		Failure_code    string                 `json:"failure_code"`
-		Failure_msg     string                 `json:"failure_msg"`
-		Metadata        map[string]interface{} `json:"metadata"`
+		ID               string                 `json:"id"`
+		Object           string                 `json:"object"`
+		Order_no         string                 `json:"order_no"`
+		Amount           uint64                 `json:"amount"`
+		Succeed          bool                   `json:"succeed"`
+		Status           string                 `json:"status"`
+		Created          uint64                 `json:"created"`
+		Time_succeed     uint64                 `json:"time_succeed"`
+		Description      string                 `json:"description"`
+		Failure_code     string                 `json:"failure_code"`
+		Failure_msg      string                 `json:"failure_msg"`
+		Metadata         map[string]interface{} `json:"metadata"`
 		Payment_id       string                 `json:"payment"`
 		Payment_order_no string                 `json:"charge_order_no"`
-		Transaction_no  string                 `json:"transaction_no"`
-		Funding_source  string                 `json:"funding_source,omitempty"`
-		Extra           map[string]interface{} `json:"extra"`
+		Transaction_no   string                 `json:"transaction_no"`
+		Funding_source   string                 `json:"funding_source,omitempty"`
+		Extra            map[string]interface{} `json:"extra"`
 	}
 	// RefundList 付款查询结果列表数据类型
 	RefundList struct {
@@ -457,8 +461,8 @@ type (
 		App_display_name  string `json:"app_display_name"`
 		Summary_from      uint64 `json:"summary_from"`
 		Summary_to        uint64 `json:"summary_to"`
-		Payments_amount    uint64 `json:"payments_amount"`
-		Payments_count     uint64 `json:"payments_count"`
+		Payments_amount   uint64 `json:"payments_amount"`
+		Payments_count    uint64 `json:"payments_count"`
 	}
 )
 
@@ -547,8 +551,8 @@ type (
 		Created     int64                  `json:"created"`
 		Description string                 `json:"description"`
 		Metadata    map[string]interface{} `json:"metadata"`
-		Payments     []struct {
-			Payment         string  `json:"payment"`
+		Payments    []struct {
+			Payment        string  `json:"payment"`
 			Amount         *int64  `json:"amount,omitempty"`
 			Description    *string `json:"description,omitempty"`
 			Status         string  `json:"status"`
@@ -564,7 +568,7 @@ type (
 	BatchRefundParams struct {
 		App         string                   `json:"app"`
 		Batch_no    string                   `json:"batch_no"`
-		Payments     []map[string]interface{} `json:"payments"`
+		Payments    []map[string]interface{} `json:"payments"`
 		Description string                   `json:"description,omitempty"`
 		Metadata    map[string]interface{}   `json:"metadata,omitempty"`
 	}
@@ -583,7 +587,7 @@ type (
 		Trade_no         string                 `json:"trade_no"`
 		Customs_code     string                 `json:"customs_code"`
 		Amount           int64                  `json:"amount"`
-		Payment           string                 `json:"payment"`
+		Payment          string                 `json:"payment"`
 		Transport_amount int64                  `json:"transport_amount"`
 		Is_split         bool                   `json:"is_split"`
 		Sub_order_no     string                 `json:"sub_order_no"`
@@ -603,7 +607,7 @@ type (
 		Trade_no         string                 `json:"trade_no"`
 		Customs_code     string                 `json:"customs_code"`
 		Amount           int64                  `json:"amount"`
-		Payment           string                 `json:"payment"`
+		Payment          string                 `json:"payment"`
 		Transport_amount int64                  `json:"transport_amount"`
 		Is_split         bool                   `json:"is_split"`
 		Sub_order_no     string                 `json:"sub_order_no"`
@@ -864,45 +868,45 @@ type (
 	// OrderPayParams 订单支付请求参数
 	OrderPayParams struct {
 		Payment_amount   *int64                 `json:"charge_amount,omitempty"`
-		Channel         string                 `json:"channel,omitempty"`
-		Extra           map[string]interface{} `json:"extra,omitempty"`
-		TimeExpire      int64                  `json:"time_expire,omitempty"` // 时间戳
+		Channel          string                 `json:"channel,omitempty"`
+		Extra            map[string]interface{} `json:"extra,omitempty"`
+		TimeExpire       int64                  `json:"time_expire,omitempty"` // 时间戳
 		Payment_order_no string                 `json:"charge_order_no,omitempty"`
 	}
 
 	// Order 数据类型
 	Order struct {
-		ID                string                 `json:"id"`
-		Object            string                 `json:"object"`
-		Created           int64                  `json:"created"`
-		Livemode          bool                   `json:"livemode"`
-		Refunded          bool                   `json:"refunded"`
-		Status            string                 `json:"status"`
-		Paid              bool                   `json:"paid"`
-		App               string                 `json:"app"`
-		Uid               string                 `json:"uid"`
-		Merchant_order_no string                 `json:"merchant_order_no"`
-		Amount            int64                  `json:"amount"`
-		Coupon_amount     int64                  `json:"coupon_amount"`
-		Actual_amount     int64                  `json:"actual_amount"`
-		Amount_paid       int64                  `json:"amount_paid"`
-		Amount_refunded   int64                  `json:"amount_refunded"`
-		Currency          string                 `json:"currency"`
-		Subject           string                 `json:"subject"`
-		Body              string                 `json:"body"`
-		Client_ip         string                 `json:"client_ip"`
-		Time_paid         int64                  `json:"time_paid"`
-		Time_expire       int64                  `json:"time_expire"`
-		Coupon            string                 `json:"coupon"`
+		ID                 string                 `json:"id"`
+		Object             string                 `json:"object"`
+		Created            int64                  `json:"created"`
+		Livemode           bool                   `json:"livemode"`
+		Refunded           bool                   `json:"refunded"`
+		Status             string                 `json:"status"`
+		Paid               bool                   `json:"paid"`
+		App                string                 `json:"app"`
+		Uid                string                 `json:"uid"`
+		Merchant_order_no  string                 `json:"merchant_order_no"`
+		Amount             int64                  `json:"amount"`
+		Coupon_amount      int64                  `json:"coupon_amount"`
+		Actual_amount      int64                  `json:"actual_amount"`
+		Amount_paid        int64                  `json:"amount_paid"`
+		Amount_refunded    int64                  `json:"amount_refunded"`
+		Currency           string                 `json:"currency"`
+		Subject            string                 `json:"subject"`
+		Body               string                 `json:"body"`
+		Client_ip          string                 `json:"client_ip"`
+		Time_paid          int64                  `json:"time_paid"`
+		Time_expire        int64                  `json:"time_expire"`
+		Coupon             string                 `json:"coupon"`
 		Payment            string                 `json:"payment"`
-		Payments           PaymentList             `json:"payments"`
+		Payments           PaymentList            `json:"payments"`
 		Payment_essentials map[string]interface{} `json:"charge_essentials"`
-		Available_balance int64                  `json:"available_balance"`
-		ReceiptApp        string                 `json:"receipt_app"`
-		ServiceApp        string                 `json:"service_app"`
-		AvailableMethods  []string               `json:"available_methods"`
-		Description       string                 `json:"description"`
-		Metadata          map[string]interface{} `json:"metadata"`
+		Available_balance  int64                  `json:"available_balance"`
+		ReceiptApp         string                 `json:"receipt_app"`
+		ServiceApp         string                 `json:"service_app"`
+		AvailableMethods   []string               `json:"available_methods"`
+		Description        string                 `json:"description"`
+		Metadata           map[string]interface{} `json:"metadata"`
 	}
 
 	// OrderList Order 列表数据类型
@@ -925,7 +929,7 @@ type (
 		User               string                 `json:"user"`
 		From               string                 `json:"from"`
 		UserFee            int                    `json:"user_fee"`
-		Payment             Payment                 `json:"payment"`
+		Payment            Payment                `json:"payment"`
 		BalanceBonus       BalanceBonus           `json:"balance_bonus"`
 		BalanceTransaction string                 `json:"balance_transaction"`
 		Description        string                 `json:"description"`
@@ -949,8 +953,8 @@ type (
 type (
 	// OrderRefundParams 订单退款请求参数
 	OrderRefundParams struct {
-		Payment         string                 `json:"payment,omitempty"`
-		Payment_amount  *int64                 `json:"charge_amount,omitempty"`
+		Payment        string                 `json:"payment,omitempty"`
+		Payment_amount *int64                 `json:"charge_amount,omitempty"`
 		Description    string                 `json:"description,omitempty"`
 		Metadata       map[string]interface{} `json:"metadata,omitempty"`
 		Refund_mode    string                 `json:"refund_mode,omitempty"`
@@ -974,9 +978,9 @@ type (
 		Amount              int64                  `json:"amount"`
 		Coupon_amount       int64                  `json:"coupon_amount"`
 		Balance_amount      int64                  `json:"balance_amount"`
-		Payment_amount       int64                  `json:"charge_amount"`
+		Payment_amount      int64                  `json:"charge_amount"`
 		Balance_transaction string                 `json:"balance_transaction"`
-		Payment_refund       string                 `json:"charge_refund"`
+		Payment_refund      string                 `json:"charge_refund"`
 		Created             int64                  `json:"created"`
 		Status              string                 `json:"status"`
 		Time_succeed        int64                  `json:"time_succeed"`
@@ -1141,7 +1145,7 @@ type (
 type (
 	RechargeParams struct {
 		User         string                 `json:"user"`
-		Payment       RechargePayment         `json:"payment"`
+		Payment      RechargePayment        `json:"payment"`
 		UserFee      int                    `json:"user_fee,omitempty"`
 		BalanceBonus RechargeBonus          `json:"balance_bonus,omitempty"`
 		FromUser     string                 `json:"from_user,omitempty"`
@@ -1406,7 +1410,7 @@ type (
 		Object        string                 `json:"object"`         // 值为 `split_profit`。
 		Livemode      bool                   `json:"livemode"`       // 是否是 live 模式。
 		App           string                 `json:"app"`            // App ID。
-		Payment        string                 `json:"payment"`         // xpay 交易成功的 payment ID
+		Payment       string                 `json:"payment"`        // xpay 交易成功的 payment ID
 		Channel       string                 `json:"channel"`        // 分账使用的第三方支付渠道(暂时只支持微信境内支付渠道)。
 		OrderNo       string                 `json:"order_no"`       // 分账商户订单号
 		Type          string                 `json:"type"`           // 分账类型: `split_normal` 为普通分账,`split_return` 为完结分账
@@ -1447,7 +1451,7 @@ type (
 	// SplitProfitParams 请求创建分账参数
 	SplitProfitParams struct {
 		App        string                       `json:"app"`                // 20,required,无,App ID。
-		Payment     string                       `json:"payment"`             // 27,required,无,xpay 交易成功的 payment ID
+		Payment    string                       `json:"payment"`            // 27,required,无,xpay 交易成功的 payment ID
 		OrderNo    string                       `json:"order_no"`           // [1~64],required,无,分账单号，由商家自行生成，规则参照微信分账参数规则
 		Type       string                       `json:"type"`               // -,required,无,分账类型: `split_normal` 为普通分账,`split_return` 为完结分账
 		Recipients []SplitProfitRecipientParams `json:"recipients"`         // -,required,无,分账接收列表，类型为数组。每一个元素的具体规则参考分账接收列表请求参数（recipients）说明。

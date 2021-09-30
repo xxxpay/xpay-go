@@ -70,6 +70,24 @@ func (c Client) Get(id string) (*xpay.Payment, error) {
 	return payment, err
 }
 
+func (c Client) Pay(id string, token string) (*xpay.Payment, error) {
+	params := &xpay.PaymentPayParams{Token: token}
+	paramsString, errs := xpay.JsonEncode(params)
+	if errs != nil {
+		if xpay.LogLevel > 0 {
+			log.Printf("PaymentPayParams Marshall Errors is : %q\n", errs)
+		}
+	}
+	payment := &xpay.Payment{}
+	err := c.backend.Call("POST", "/payments/"+id+"/pay", nil, paramsString, payment)
+	if err != nil {
+		if xpay.LogLevel > 0 {
+			log.Printf("Pay Payment error: %v\n", err)
+		}
+	}
+	return payment, err
+}
+
 func (c Client) List(appId string, params *xpay.PaymentListParams) *Iter {
 	type chargeList struct {
 		xpay.ListMeta
