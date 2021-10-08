@@ -46,6 +46,11 @@ func (it *Iter) getPage() {
 	}
 }
 
+//获取迭代器剩下的所有数据
+func (it *Iter) Values() []interface{} {
+	return it.values
+}
+
 //获取下一条数据
 func (it *Iter) Next() bool {
 	if len(it.values) == 0 && it.meta.More && !it.params.Single {
