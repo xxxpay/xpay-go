@@ -43,7 +43,7 @@ type (
 		Subject     string                 `json:"subject"`
 		Body        string                 `json:"body"`
 		Extra       map[string]interface{} `json:"extra,omitempty"`
-		Metadata    map[string]interface{} `json:"metadata,omitempty"`
+		Metadata    interface{}            `json:"metadata,omitempty"`
 		Time_expire int64                  `json:"time_expire,omitempty"`
 		Description string                 `json:"description,omitempty"`
 	}
@@ -84,7 +84,7 @@ type (
 		Amount_refunded uint64                 `json:"amount_refunded"`
 		Failure_code    string                 `json:"failure_code"`
 		Failure_msg     string                 `json:"failure_msg"`
-		Metadata        map[string]interface{} `json:"metadata"`
+		Metadata        interface{}            `json:"metadata"`
 		Credential      map[string]interface{} `json:"credential"`
 		Description     string                 `json:"description"`
 	}
