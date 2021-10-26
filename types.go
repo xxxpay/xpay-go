@@ -100,10 +100,10 @@ type (
 type (
 	// RefundParams 退款请求数据类型
 	RefundParams struct {
-		Amount         uint64                 `json:"amount,omitempty"`
-		Description    string                 `json:"description"`
-		Metadata       map[string]interface{} `json:"metadata,omitempty"`
-		Funding_source string                 `json:"funding_source,omitempty"`
+		Amount         uint64      `json:"amount,omitempty"`
+		Description    string      `json:"description"`
+		Metadata       interface{} `json:"metadata,omitempty"`
+		Funding_source string      `json:"funding_source,omitempty"`
 	}
 
 	// RefundListParams 退款查询请求的数据类型
@@ -125,7 +125,7 @@ type (
 		Description      string                 `json:"description"`
 		Failure_code     string                 `json:"failure_code"`
 		Failure_msg      string                 `json:"failure_msg"`
-		Metadata         map[string]interface{} `json:"metadata"`
+		Metadata         interface{}            `json:"metadata"`
 		Payment_id       string                 `json:"payment"`
 		Payment_order_no string                 `json:"charge_order_no"`
 		Transaction_no   string                 `json:"transaction_no"`
