@@ -1540,3 +1540,27 @@ type (
 		Values []*SubBank `json:"data"`
 	}
 )
+
+// 对账相关数据类型
+type (
+
+	// 查询交易账单
+	TradeListParams struct {
+		Date    string `json:"date"`    // 查询日期
+		Channel string `json:"channel"` // 查询支付渠道
+	}
+
+	// 交易账单
+	TradeList struct {
+	}
+
+	// 查询资金账单
+	FundListParams struct {
+		Date    string `json:"date"`    // 查询日期
+		Channel string `json:"channel"` // 查询支付渠道
+	}
+
+	// 资金账单
+	FundList struct {
+	}
+)
