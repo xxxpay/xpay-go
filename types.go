@@ -1550,17 +1550,31 @@ type (
 		Channel string `json:"channel"` // 查询支付渠道
 	}
 
+	Trade struct {
+		Type                string      `json:"type"`                  // 交易类型。pay：支付成功，revoke：撤销成功，refund：发起退款成功
+		Time                int64       `json:"created"`               // 交易时间。
+		TransactionNo       string      `json:"transaction_no"`        // 支付渠道的支付流水号，如果是退款，为退款对应的支付流水号。
+		OrderNo             string      `json:"order_no"`              // 商户订单号，如果是退款，为退款对应的商户订单号。
+		RefundTransactionNo string      `json:"refund_transaction_no"` // 渠道的退款流水号。非退款时为空。
+		RefundOrderNo       string      `json:"refund_order_no"`       // 商户退款单号，非退款时为空。
+		Currency            string      `json:"currency"`              // 3 位 ISO 货币代码，小写字母。
+		Amount              int64       `json:"amount"`                // 交易金额，单位为对应币种的最小货币单位，人民币为分。
+		Succeeded           bool        `json:"succeeded"`             // 是否成功。退款交易可能即没成功，也没失败，代表处理中。
+		Failed              bool        `json:"failed"`                // 是否失败。退款交易可能即没成功，也没失败，代表处理中。
+		Body                string      `json:"body"`                  // 商品描述信息。
+		Extra               interface{} `json:"extra"`                 // 渠道扩展信息。
+	}
+
+	TradeSummary struct {
+		Count          int64 `json:"count"`         // 交易数量。
+		Amount         int64 `json:"Amount"`        // 支付成功总金额。
+		AmountRefunded int64 `json:"amount_funded"` // 退款成功总金额，包括撤销的金额。
+		AmountFee      int64 `json:"amount_fee"`    // 手续费总金额。
+	}
+
 	// 交易账单
 	TradeList struct {
-	}
-
-	// 查询资金账单
-	FundListParams struct {
-		Date    string `json:"date"`    // 查询日期
-		Channel string `json:"channel"` // 查询支付渠道
-	}
-
-	// 资金账单
-	FundList struct {
+		Data    []*Trade      `json:"data"`
+		Summary *TradeSummary `json:"summary"`
 	}
 )
