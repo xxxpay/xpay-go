@@ -1552,7 +1552,7 @@ type (
 
 	Trade struct {
 		Type                string      `json:"type"`                  // 交易类型。pay：支付成功，revoke：撤销成功，refund：发起退款成功
-		Time                int64       `json:"created"`               // 交易时间。
+		Created             int64       `json:"created"`               // 交易时间。
 		TransactionNo       string      `json:"transaction_no"`        // 支付渠道的支付流水号，如果是退款，为退款对应的支付流水号。
 		OrderNo             string      `json:"order_no"`              // 商户订单号，如果是退款，为退款对应的商户订单号。
 		RefundTransactionNo string      `json:"refund_transaction_no"` // 渠道的退款流水号。非退款时为空。
