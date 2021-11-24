@@ -70,6 +70,20 @@ func (c Client) Get(id string) (*xpay.Payment, error) {
 	return payment, err
 }
 
+func (c Client) GetByTransactionNo(transactionNo string) (*xpay.Payment, error) {
+	var body *url.Values
+	body = &url.Values{}
+	body.Add("transaction_no", transactionNo)
+	payment := &xpay.Payment{}
+	err := c.backend.Call("GET", "/payments", body, nil, payment)
+	if err != nil {
+		if xpay.LogLevel > 0 {
+			log.Printf("Get Payment by transaction no error: %v\n", err)
+		}
+	}
+	return payment, err
+}
+
 func (c Client) Pay(id string, token string) (*xpay.Payment, error) {
 	params := &xpay.PaymentPayParams{Token: token}
 	paramsString, errs := xpay.JsonEncode(params)

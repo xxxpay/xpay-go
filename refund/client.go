@@ -43,6 +43,15 @@ func (c Client) Get(chid string, reid string) (*xpay.Refund, error) {
 	return refund, err
 }
 
+func (c Client) GetByTransactionNo(transactionNo string) (*xpay.Refund, error) {
+	var body *url.Values
+	body = &url.Values{}
+	body.Add("transaction_no", transactionNo)
+	refund := &xpay.Refund{}
+	err := c.backend.Call("GET", "/refunds", body, nil, refund)
+	return refund, err
+}
+
 func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
 	body := &url.Values{}
 	var lp *xpay.ListParams
