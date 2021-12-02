@@ -52,7 +52,12 @@ func (c Client) GetByTransactionNo(transactionNo string) (*xpay.Refund, error) {
 	return refund, err
 }
 
-func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
+func (c Client) List(appId string, params *xpay.RefundListParams) *Iter {
+	if params == nil {
+		params = &xpay.RefundListParams{}
+	}
+	params.Filters.AddFilter("app[id]", "", appId)
+
 	body := &url.Values{}
 	var lp *xpay.ListParams
 
@@ -61,7 +66,31 @@ func (c Client) List(chid string, params *xpay.RefundListParams) *Iter {
 
 	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
 		list := &xpay.RefundList{}
-		err := c.backend.Call("GET", fmt.Sprintf("/payments/%v/refunds", chid), &b, nil, list)
+		err := c.backend.Call("GET", "/refunds", &b, nil, list)
+
+		ret := make([]interface{}, len(list.Values))
+		for i, v := range list.Values {
+			ret[i] = v
+		}
+
+		return ret, list.ListMeta, err
+	})}
+}
+
+func (c Client) ListByPayment(paymentId string, params *xpay.RefundListParams) *Iter {
+	if params == nil {
+		params = &xpay.RefundListParams{}
+	}
+
+	body := &url.Values{}
+	var lp *xpay.ListParams
+
+	params.AppendTo(body)
+	lp = &params.ListParams
+
+	return &Iter{xpay.GetIter(lp, body, func(b url.Values) ([]interface{}, xpay.ListMeta, error) {
+		list := &xpay.RefundList{}
+		err := c.backend.Call("GET", fmt.Sprintf("/payments/%v/refunds", paymentId), &b, nil, list)
 
 		ret := make([]interface{}, len(list.Values))
 		for i, v := range list.Values {
